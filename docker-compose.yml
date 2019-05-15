@@ -1,0 +1,15 @@
+version: "2"
+services:
+  planer:
+    container_name: planer
+    restart: always
+    build: . --pull 
+    ports:
+      - "8080:8080"
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"

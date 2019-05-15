@@ -3,10 +3,11 @@ package handler
 import (
 	"log"
 	"net/http"
-	"planer/mongo"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Maekes/planer/mongo"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jung-kurt/gofpdf"

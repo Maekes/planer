@@ -1,7 +1,7 @@
 package main
 
 import (
-	"planer/handler"
+	"github.com/Maekes/planer/handler"
 
 	jwtsession "github.com/ScottHuangZL/gin-jwt-session"
 	"github.com/gin-gonic/gin"
@@ -160,7 +160,7 @@ func main() {
 
 	r.NoRoute(handler.Error404Handler)
 
-	//r.Run("127.0.0.1:8080")
-	r.Run("0.0.0.0:80")
+	r.Run("127.0.0.1:8080")
+	//r.Run("0.0.0.0:80")
 
 }
