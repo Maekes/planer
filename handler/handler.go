@@ -160,7 +160,7 @@ func MessdienerplanCreateHandler(c *gin.Context) {
 	toDate := time.Date(to.Year(), to.Month(), to.Day(), 23, 59, 59, 0, l)
 	//data, err := messeService.GetAllMessenFromToDate(fromDate, toDate)
 
-	uid, _ := uuid.NewV4()
+	uid := uuid.NewV4()
 
 	planService.Create(&mongo.PlanModel{
 		UUID:     uid,
@@ -460,7 +460,7 @@ func AddMessenHandler(c *gin.Context) {
 	}
 
 	if c.PostForm("uuid") == "" {
-		uidm, _ := uuid.NewV4()
+		uidm := uuid.NewV4()
 		messe := mongo.MesseModel{
 			UUID:            uidm,
 			Datum:           d,
@@ -507,7 +507,7 @@ func AddMiniHandler(c *gin.Context) {
 		return
 	}
 	if c.PostForm("uuid") == "" {
-		uidm, _ := uuid.NewV4()
+		uidm := uuid.NewV4()
 		log.Println(g)
 		mini := mongo.MiniModel{
 			UUID:     uidm,
@@ -567,7 +567,7 @@ func AddMiniFromExcelHandler(c *gin.Context) {
 				break
 			}
 
-			uid, _ := uuid.NewV4()
+			uid := uuid.NewV4()
 			log.Println(row.Col(0))
 
 			groups := []string{"gray", "azure", "indigo", "purple", "pink", "red", "orange", "yellow", "lime"}
@@ -631,7 +631,7 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 					log.Println("Could not Parse Time")
 				}
 
-				uid, _ := uuid.NewV4()
+				uid := uuid.NewV4()
 
 				m := mongo.MesseModel{
 					UUID:            uid,

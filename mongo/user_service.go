@@ -47,7 +47,7 @@ func (p *UserService) CreateNewUser(name, mail, password string) error {
 		return errors.New("Diese E-Mail Adresse wird bereits verwendet")
 	}
 
-	uid, err := uuid.NewV4()
+	uid := uuid.NewV4()
 	hp, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		return errors.New("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.")
