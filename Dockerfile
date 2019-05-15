@@ -1,6 +1,6 @@
 FROM golang:1.12.5-stretch as builder
-WORKDIR $GOPATH/go/src/planer
+WORKDIR /go/src/github.com/Maekes/planer
 COPY . .
-RUN go get -u
+RUN go get -u -v
 EXPOSE 8080
 CMD ["planer"]
