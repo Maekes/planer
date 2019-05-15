@@ -1,8 +1,9 @@
 FROM golang:1.12.5-stretch as builder
 WORKDIR /go/src/github.com/Maekes/planer
 #COPY . .
-#RUN go get -v github.com/Maekes/planer
 
+ENV GO111MODULE=on
+RUN go get http://github.com/Maekes/planer
 # COPY go.mod and go.sum files to the workspace
 COPY go.mod . 
 COPY go.sum .
@@ -11,10 +12,13 @@ COPY go.sum .
 RUN go mod download
 # COPY the source code as the last step
 COPY . .
-
+#RUN go get ./...
+WORKDIR /go/src/github.com/Maekes/planer
+RUN go install
 # Build the binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/hello
+CMD ["planer"]
 
-FROM scratch 
-COPY --from=build-env /go/bin/hello /go/bin/hello
-ENTRYPOINT ["/go/bin/hello"]
+#FROM scratch 
+#COPY /go/src/github.com/Maekes/planer/planer /go/bin/planer
+#EXPOSE 80
+#ENTRYPOINT ["planer"]
