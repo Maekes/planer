@@ -1,0 +1,194 @@
+{{define "content"}}
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">
+      Messdienerliste
+    </h1>
+    <div class="page-subtitle">65 Messdiener in der Liste</div>
+    <div class="page-options d-flex">
+      <select class="form-control custom-select w-auto">
+        <option value="asc">Newest</option>
+        <option value="desc">Oldest</option>
+      </select>
+    </div>
+  </div>
+  <div class="row row-cards">
+    <div class="col-lg-4">
+      <form class="card" method="POST">
+        <div class="card-status  card-status bg-green"></div>
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-plus"></i> Neuen Messdiener hinzufügen</h3>
+        </div>
+        <div class="card-body">
+          <label class="form-label">Name</label>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <input type="text" id="textfieldVorname" class="form-control" placeholder="Vorname" name="vorname">
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <input type="text" id="textfieldNachname" class="form-control" placeholder="Nachname" name="nachname">
+                <input type="text" id="textfieldUUID" class="form-control" name="uuid" hidden>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gruppe</label>
+            <div class="row gutters-xs">
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-gray" type="radio" value="gray" class="colorinput-input" checked />
+                  <span class="colorinput-color bg-gray"></span>
+                </label>
+              </div>
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-azure" type="radio" value="azure" class="colorinput-input" />
+                  <span class="colorinput-color bg-azure"></span>
+                </label>
+              </div>
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-indigo" type="radio" value="indigo" class="colorinput-input" />
+                  <span class="colorinput-color bg-indigo"></span>
+                </label>
+              </div>
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-purple" type="radio" value="purple" class="colorinput-input" />
+                  <span class="colorinput-color bg-purple"></span>
+                </label>
+              </div>
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-pink" type="radio" value="pink" class="colorinput-input" />
+                  <span class="colorinput-color bg-pink"></span>
+                </label>
+              </div>
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-red" type="radio" value="red" class="colorinput-input" />
+                  <span class="colorinput-color bg-red"></span>
+                </label>
+              </div>
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-orange" type="radio" value="orange" class="colorinput-input" />
+                  <span class="colorinput-color bg-orange"></span>
+                </label>
+              </div>
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-yellow" type="radio" value="yellow" class="colorinput-input" />
+                  <span class="colorinput-color bg-yellow"></span>
+                </label>
+              </div>
+              <div class="col-auto">
+                <label class="colorinput">
+                  <input name="gruppe" id="radio-lime" type="radio" value="lime" class="colorinput-input" />
+                  <span class="colorinput-color bg-lime"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="card-footer text-right">
+          <button type="submit" class="btn btn-green"><i class="fe fe-save"></i> Speichern</button>
+        </div>
+      </form>
+
+      <form class="card" id="uploadForm" method="POST" action="/minis/importFromExcel" enctype="multipart/form-data">
+        <div class="card-status  card-status bg-green"></div>
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-table"></i> Messdiener aus Exceltabelle hinzufügen</h3>
+        </div>
+        <div class="card-body">
+          <p>Eine bestehende Messdienerliste, kann auch als Exceldatei importiert werden. Dafür muss die Datei im 
+            <b>.xls</b> (nicht .xlsx) Format vorliegen und nach folgendem Schema aufgebaut sein:</p>
+            <img class="card-img" src="/assets/images/excel.png" alt="">
+          </div>
+          <div class="card-body">
+          <p><label class="form-label">Gruppennummern und Farben</label>
+          <span class="avatar avatar-gray">1</span>
+          <span class="avatar avatar-azure">2</span>
+          <span class="avatar avatar-indigo">3</span>
+          <span class="avatar avatar-purple">4</span>
+          <span class="avatar avatar-pink">5</span>
+          <span class="avatar avatar-red">6</span>
+          <span class="avatar avatar-orange">7</span>
+          <span class="avatar avatar-yellow">8</span>
+          <span class="avatar avatar-lime">9</span></p>
+          <p>Ist das Feld "Gruppe" leer, wird der Messdiener automatisch zur Gruppe 1 (grau) zugeordnet.</p>
+        </div>
+        
+        <div class="card-footer text-right">
+          <input name="file" type="file" id="file" accept="application/vnd.ms-excel" hidden>
+          <label for="file" class="btn btn-green"><i class="fe fe-upload"></i> Excel-Datei hochladen</label>
+        </div>
+      </form>
+
+      <script>
+        document.getElementById("file").onchange = function () {
+          document.getElementById("uploadForm").submit();
+        };</script>
+
+    </div>
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="table-responsive">
+          <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
+            <thead>
+              <tr>
+                <th class="text-center w-1"><i class="icon-people"></i></th>
+                <th>Vorname</th>
+                <th>Nachname</th>
+                <th>Dummy</th>
+                <th class="text-center"><i class="icon-settings"></i></th>
+                <th class="text-center"><i class="icon-settings"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range $index, $value := .payload}}
+              <tr>
+                <td class="pt-2 pb-2"><span class="avatar avatar-{{.Gruppe}}">{{initialen .Vorname .Nachname}}</span>
+                </td>
+                <td class="pt-2 pb-2">
+                  <div>{{.Vorname}}</div>
+                </td>
+                <td class="pt-2 pb-2">
+                  <div>{{.Nachname}}</div>
+                </td>
+                <td class="text-left pt-2 pb-2">{{.UUID}}</td>
+
+                <td class="text-center pt-2 pb-2">
+                  <a href="#" class="icon" onclick="edit({{.Vorname}}, {{.Nachname}}, {{.Gruppe}}, {{.UUID}})"><i
+                      class="fe fe-edit-2"></i>
+                  </a>
+                </td>
+                <td class="text-center pt-2 pb-2">
+                  <a href="/minis/delete/{{.UUID}}" class="icon"><i class="fe fe-trash-2"></i>
+                  </a>
+                </td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function edit(vorname, nachname, gruppe, uuid) {
+    document.getElementById("textfieldVorname").value = vorname
+    document.getElementById("textfieldNachname").value = nachname
+    document.getElementById("textfieldUUID").value = uuid
+    document.getElementById("radio-" + gruppe).checked = true
+  }
+</script>
+
+{{end}}

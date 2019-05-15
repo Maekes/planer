@@ -1,0 +1,148 @@
+{{define "content"}}
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">
+      Messfeiern in St. Quirin
+    </h1>
+  </div>
+  <div class="row row-cards">
+    <div class="col-lg-3">
+
+      <form class="card" method="POST">
+        <div class="card-status  card-status bg-green"></div>
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-plus"></i> Neue Messe hinzufügen</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Datum & Uhrzeit</label>
+            <input type="text" name="date" data-timepicker="true" id="datepicker" class="form-control datepicker-here"
+              placeholder="" data-language="de" data-position="right top" placeholder="01.02.2019 11:30" required />
+          </div>
+          <script>
+           
+            function edit(Datum, Uhrzeit, Gottesdienst, LiturgischerTag, Bemerkung, UUID) {
+              console.log(Datum)
+              document.getElementById("textfieldGottesdienst").value = Gottesdienst
+              document.getElementById("textfieldBemerkung").value = Bemerkung
+              document.getElementById("textfieldTag").value = LiturgischerTag
+              document.getElementById("textfieldUUID").value = UUID
+              document.getElementById("datepicker").value = Datum + " " + Uhrzeit
+              
+            }
+          </script>
+          <div class="form-group">
+            <label class="form-label">Gottesdienst</label>
+            <input type="text" name="gottesdienst" id="textfieldGottesdienst" class="form-control" placeholder="Messe"
+              required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Litrugischer Tag</label>
+            <input type="text" name="tag" id="textfieldTag" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Bemerkung</label>
+            <input type="text" name="bemerkung" id="textfieldBemerkung" class="form-control" />
+          </div>
+          <input type="text" id="textfieldUUID" class="form-control" name="uuid" hidden>
+
+
+        </div>
+        <div class="card-footer text-right">
+          <button type="submit" class="btn btn-green"><i class="fe fe-save"></i> Speichern</button>
+        </div>
+      </form>
+
+        <form class="card" id="uploadForm" method="POST" action="/messen/importFromExcel" enctype="multipart/form-data">
+          <div class="card-status  card-status bg-green"></div>
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa fa-table"></i> Messen aus Exceltabelle hinzufügen</h3>
+          </div>
+          <div class="card-body">
+            <p>Ein bestehender Messplan, kann auch als Exceldatei importiert werden. Dafür muss die Datei im 
+              <b>.xls</b> (nicht .xlsx) Format vorliegen und nach folgendem Schema aufgebaut sein:</p>
+              <img class="card-img" src="/assets/images/excel.png" alt="">
+            </div>          
+          <div class="card-footer text-right">
+            <input name="file" type="file" id="file" accept="application/vnd.ms-excel" hidden>
+            <label for="file" class="btn btn-green"><i class="fe fe-upload"></i> Excel-Datei hochladen</label>
+          </div>
+        </form>
+
+        <form class="card" method="POST" action="/messen/deleteAll">
+          <div class="card-status  card-status bg-red"></div>
+          <div class="card-header">
+            <h3 class="card-title"><i class="fe fe-trash-2"></i> Alle Messen löschen</h3>
+          </div>
+          <div class="card-body">
+            <p>Lorem Ipsum</p>
+        
+            </div>          
+          <div class="card-footer text-right">
+            <button submit class="btn btn-red"><i class="fe fe-trash-2"></i> Alle Messen Löschen</button>
+          </div>
+        </form>
+  
+        <script>
+          document.getElementById("file").onchange = function () {
+            document.getElementById("uploadForm").submit();
+          };</script>
+  
+      </form>
+    </div>
+    <div class="col-lg-9">
+
+      <div class="card">
+        <div class="table-responsive">
+          <table class="table card-table">
+            <tr>
+              <th>Relev.</th>
+              <th>Tag</th>
+              <th>Datum</th>
+              <th>Zeit</th>
+              <th>Gottesdienst</th>
+              <th>Liturgischer Tag</th>
+              <th>Bemerkungen</th>
+              <th class="text-center"><i class="icon-settings"></i></th>
+              <th class="text-center"><i class="icon-settings"></i></th>
+            </tr>
+            {{range $index, $value := .payload}}
+            <tr>
+              <td class="text-center pt-2">
+                <label class="custom-control custom-checkbox custom-control-inline "
+                  style="min-height:1.0rem; top:0.1rem;">
+                  <input type="checkbox" class="custom-control-input" id="{{convert .UUID}}"
+                    onclick="updateCheck(this);" {{if .IsRelevant}} checked{{end}}>
+                  <span class="custom-control-label"></span>
+                </label>
+              </td>
+              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{getDay .Datum}}</td>
+              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{getDate .Datum}}</td>
+              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{getTime .Datum}}</td>
+              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{.Gottesdienst}}</td>
+              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{.LiturgischerTag}}</td>
+              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{.Bemerkung}}</td>
+              <td class="text-center pt-2 pb-2">
+                <a href="#" class="icon"
+                  onclick="edit({{getDate .Datum}},{{getTime .Datum}}, {{.Gottesdienst}},{{.LiturgischerTag}},{{.Bemerkung}}, {{.UUID}} ) "><i
+                    class="fe fe-edit-2"></i>
+                </a>
+              </td>
+              <td class="text-center pt-2 pb-2">
+                <a href="/messen/delete/{{.UUID}}" class="icon"><i class="fe fe-trash-2"></i>
+                </a>
+              </td>
+            </tr>
+            {{end}}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{{end}}

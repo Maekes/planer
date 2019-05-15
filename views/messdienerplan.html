@@ -1,0 +1,89 @@
+{{define "content"}}
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">
+      Meine Messdienerpläne
+    </h1>
+  </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-status  card-status bg-green"></div>
+        <div class="card-header">
+          <h3 class="card-title">Neuen Plan anlegen</h3>
+        </div>
+        <div class="card-body">
+          <form action="/messdienerplan/create" method="POST">
+            <div class="form-group">
+              <label class="form-label">Titel</label>
+              <input class="form-control" name="title" placeholder="Januar / Februar" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Von</label>
+              <input type="text" name="from"  id="datepicker" class="form-control datepicker-here" placeholder="28.02.2019" data-language="de" data-position="right top" />
+            </div>
+
+
+            <div class="form-group">
+              <label class="form-label">Bis</label>
+              <input type="text" name="to"  id="datepicker" class="form-control datepicker-here" placeholder="28.02.2019" data-language="de" data-position="right top" />
+            </div>
+
+
+            <script>
+              // Initialization
+              document.getElementById("datepicker").datepicker([options])
+              // Access instance of plugin
+              document.getElementById("datepicker").data('datepicker')
+            </script>
+
+            <div class="form-footer">
+              <button submit class="btn btn-success btn-block"> <i class="fe fe-chevrons-right"></i> Anlegen &
+                Bearbeiten</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      {{range $index, $value := .planPayload}}
+      <div class="card card-collapsed">
+        <div class="card-status  card-status-left bg-red"></div>
+        <div class="card-header">
+          <div class="text-wrap">
+            <h4 class="mb-1">{{.Titel}}</h4>
+            <p class="leading-tight mb-0 text-muted"><i class="fe fe-calendar"></i> {{getDate .Von}} - {{getDate .Bis}}
+            </p>
+          </div>
+
+          <div class="card-options">
+            <a href="/messdienerplan/pdf/{{.UUID}}" class="btn btn-outline-danger btn-sm"><i
+                class="fa fa-file-pdf-o"></i> PDF</a>
+            <a href="/zuordnen/{{.UUID}}" class="btn btn-outline-secondary btn-sm ml-2"><i class="fe fe-edit"></i>
+              Bearbeiten</a>
+            <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="leading-tight mb-3"><i class="fe fe-calendar"></i> Erstellt am: {{getDate .Erstellt}} <i
+              class="fe fe-calendar ml-5"></i> ID: {{ .UUID}} </p>
+          <p class="leading-tight">Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+            sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
+            sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
+            clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+          <p class="leading-tight text-right"><a href="#" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Plan
+              Löschen</a></p>
+        </div>
+      </div>
+
+
+      {{end}}
+    </div>
+
+  </div>
+</div>
+
+{{end}}

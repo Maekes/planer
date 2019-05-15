@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+    {{include "layouts/_head"}}
+  <body class="">
+    <div class="page">
+      <div class="page-main">
+        <div class="header py-4">
+          <div class="container">
+            <div class="d-flex">
+                <!-- Logo -->
+                <a class="header-brand" href="/index.html">
+                    <img src="/demo/brand/tabler.svg" class="header-brand-img" alt="tabler logo">
+                </a>
+
+                <!-- Profilbereich mit Mobile Dropdown -->
+                {{include "layouts/_navbarMobile"}}
+                <!-- Menu -->
+                {{include "layouts/_navbar"}}
+                <!-- Seiteninhalt -->
+                <div class="my-3 my-md-5">
+                 
+                    {{template "content" .}}
+                </div>
+
+            </div>
+            <!-- Footer -->
+            {{include "layouts/_footer"}}
+    </div>
+  </body>
+</html>

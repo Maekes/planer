@@ -1,0 +1,221 @@
+{{define "content"}}
+
+
+<div class="container">
+    <div class="page-header">
+
+
+        <div class="text-wrap">
+            <h1 class="page-title mb-2">
+                Messdienerplan <b class="ml-3"> {{.planTitle}}</b>
+            </h1>
+            <p class="leading-tight mb-0"><i class="fe fe-calendar mr-1"></i> {{.from}} - {{.to}}
+            </p>
+        </div>
+
+    </div>
+    <p>Hier kannst du deine Messdiener in den Plan eintragen. Alle Daten werden automatisch gespeichert.</p>
+    <div class="row row-cards">
+        <div class="col-md-8">
+            {{range $index, $value := .messenPayload}}
+            <div class="card">
+                <div class="card-status card-status-left bg-blue"></div>
+                <div class="card-header ">
+                    <div class="col-md-4">
+                        <div class="text-wrap">
+                            <h4 class="mb-0">{{.Gottesdienst}} </h4>
+                            <p class="leading-tight mb-0">{{getDay .Datum}} - {{getDate .Datum}} - {{getTime .Datum}}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-wrap">
+                            <p class="leading-tight tracking-tight mb-0"> <b>T: </b>{{.LiturgischerTag}}</p>
+                            <p class="leading-tight tracking-tight mb-0"> <b>B: </b>{{.Bemerkung}}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 ">
+                        <div class="form-group align-middle mb-0">
+                            <div class="input">
+                                <input type="text" name="{{.UUID}}" class="form-control" placeholder="Info für den Plan"
+                                    onblur="autosave(this)" value="{{.InfoForPlan}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body" id="{{.UUID}}" ondrop="handleDrop(event, this)">
+                    <div class="tags">
+                        {{if not .MinisForPlan}}
+
+                        {{else}}
+                        {{range $index, $value := .MinisForPlan}}
+
+                        <span class="tag" name="{{$value}}">
+                            <h4 class="m-1 pr-1">{{getMiniNameFromUUID $value}}</h4>
+                            <h4 style="cursor: pointer;" class="m-0 pt-1 pr-2 pl-2 avatar-{{getMiniGruppeUUID $value}}"
+                                onclick="deleteMiniFromMesse(this);">X</h4>
+                        </span>
+
+                        {{end}}
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        <div class="col-md-4">
+            <div class="affix position-fixed" style="overflow-y:scroll; height:60%;">
+
+                {{range $index, $value := .minisPayload}}
+                <div class="tags mb-5">
+                    {{range $index, $value := $value}}
+                    <span class="tag" id="{{.UUID}}" draggable="true">
+                        <h4 class="m-1 pr-1">{{.Vorname}} {{.Nachname}}</h4>
+                        <h4 class="m-0 pt-1 pr-2 pl-2 avatar-{{.Gruppe}}"> {{countInPlan .UUID $.UUID}}</h4>
+                    </span>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<style>
+    .over {
+        background-color: rgb(252, 255, 249);
+    }
+</style>
+
+<script>
+
+    function autosave(t) {
+        const xhttp = new XMLHttpRequest();
+        uid = t.getAttribute("name")
+        value = t.value
+        xhttp.open("POST", "/zuordnen/editInfoForPlan?uid=" + uid + "&value=" + value);
+        xhttp.send();
+    }
+
+
+    function deleteMiniFromMesse(e) {
+        const xhttp = new XMLHttpRequest();
+        uid = e.parentNode.getAttribute("name");
+        from = e.parentNode.parentNode.parentNode.id
+        document.getElementById(uid).lastElementChild.innerHTML--
+        xhttp.open("POST", "/zuordnen/delete?uid=" + uid + "&from=" + from);
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                e.parentNode.remove()
+            }
+            if (this.readyState == 4 && this.status == 0) {
+                alert("Konnte keine Verbindung zum Server aufbauen!\nStatus bleibt unverändert.")
+            }
+        }
+    }
+
+
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault(); // Necessary. Allows us to drop.
+        }
+        this.classList.add('over');
+        //e.dataTransfer.dropEffect = 'move'; // See the section on the DataTransfer object.
+
+        return false;
+    }
+
+    function handleDragEnter(e) {
+        // this / e.target is the current hover target.
+
+        this.classList.add('over');
+
+
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('over'); // this / e.target is previous target element.
+    }
+
+    function handleDragStart(e) {
+        this.style.opacity = '0.4'; // this / e.target is the source node.
+        e.dataTransfer.setData("text", this.id);
+        console.log(this.id);
+
+    }
+
+    function handleDrop(e, el) {
+        // this / e.target is current target element.
+        el.classList.remove('over');
+        e.preventDefault();
+        var data = e.dataTransfer.getData('text');
+        const xhttp = new XMLHttpRequest();
+        query = "/zuordnen/draged?from=" + data + "&to=" + el.id
+
+        xhttp.open("POST", query);
+        xhttp.send();
+
+        xhttp.onreadystatechange = function () {
+
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById(data).lastElementChild.innerHTML++
+                var nodeCopy = document.getElementById(data).cloneNode(true)
+                nodeCopy.style.opacity = '1'
+
+                nodeCopy.setAttribute('draggable', false);
+                nodeCopy.setAttribute('name', nodeCopy.id);
+                nodeCopy.id = ''
+
+                var child_nodes = nodeCopy.childNodes;
+                var first = child_nodes[1];
+                var second = child_nodes[3];
+
+                nodeCopy.innerHTML = '';
+
+                console.log(second.classList[4])
+
+                second.className = 'm-0 pt-1 pr-2 pl-2 ' + second.classList[4]
+                second.style = 'cursor: pointer;'
+                second.innerHTML = 'X'
+
+                second.setAttribute("onclick", "deleteMiniFromMesse(this);");
+                nodeCopy.appendChild(first);
+                nodeCopy.appendChild(second);
+
+
+                el.childNodes[1].appendChild(nodeCopy);
+            }
+            if (this.readyState == 4 && this.status == 0) {
+                alert("Konnte keine Verbindung zum Server aufbauen!\nStatus bleibt unverändert.")
+            }
+        }
+
+
+        // See the section on the DataTransfer object.
+
+        return false;
+    }
+
+    function handleDragEnd(e) {
+        // this/e.target is the source node.
+        this.style.opacity = '1';
+    }
+
+    var messen = document.querySelectorAll('.card-body');
+    [].forEach.call(messen, function (messe) {
+        messe.addEventListener('dragenter', handleDragEnter, false);
+        messe.addEventListener('dragover', handleDragOver, false);
+        messe.addEventListener('dragleave', handleDragLeave, false);
+        messe.addEventListener('dragend', handleDragEnd, false);
+    });
+
+    var minis = document.querySelectorAll('.tag');
+    [].forEach.call(minis, function (mini) {
+        mini.addEventListener('dragstart', handleDragStart, false);
+        mini.addEventListener('dragend', handleDragEnd, false);
+    });
+</script>
+{{end}}

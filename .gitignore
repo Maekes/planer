@@ -1,4 +1,6 @@
-.DS_Store
-.xls
-.xlsx
-.pdf
+*.DS_Store
+*.xls
+*.xlsx
+*.pdf
+/.vscode
+/bin
