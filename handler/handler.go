@@ -72,16 +72,6 @@ func RegisterPostHandler(c *gin.Context) {
 		return
 	}
 
-	if err := userService.CreateNewUser(form.Name, form.Mail, form.Password); err != nil {
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
-			"Title": "Register",
-			"error": err.Error(),
-			"user":  form.Name,
-			"mail":  form.Mail,
-		})
-		return
-	}
-
 	score := zxcvbn.PasswordStrength(form.Password, nil)
 	if score.Score < 3 {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
@@ -97,6 +87,16 @@ func RegisterPostHandler(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"Title": "Register",
 			"error": "Passwörter sind nicht gleich.",
+			"user":  form.Name,
+			"mail":  form.Mail,
+		})
+		return
+	}
+
+	if err := userService.CreateNewUser(form.Name, form.Mail, form.Password); err != nil {
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			"Title": "Register",
+			"error": err.Error(),
 			"user":  form.Name,
 			"mail":  form.Mail,
 		})
