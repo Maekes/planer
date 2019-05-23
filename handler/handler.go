@@ -29,8 +29,8 @@ var planService *mongo.PlanService
 
 var session *mongo.Session
 
-func InitHandler() {
-	session, err := mongo.NewSession("mongo:27017")
+func InitHandler(url string) {
+	session, err := mongo.NewSession(url)
 	if err != nil {
 		log.Fatalf("Unable to connect to mongo: %s", err)
 	}

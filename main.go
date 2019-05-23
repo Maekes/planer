@@ -1,6 +1,9 @@
 package main
 
 import (
+	"flag"
+	"os"
+
 	"github.com/Maekes/planer/handler"
 
 	jwtsession "github.com/ScottHuangZL/gin-jwt-session"
@@ -105,8 +108,18 @@ func main() {
 			}
 		}
 	*/
-	handler.InitHandler()
-	gin.SetMode(gin.ReleaseMode)
+	flag := ""
+	if len(os.Args) > 1 {
+		flag = os.Args[1]
+	}
+
+	if flag == "-l" {
+		handler.InitHandler(":27017")
+	} else {
+		handler.InitHandler("mongo:27017")
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r := gin.Default()
 
 	jwtsession.JwtTokenName = "Token"                   //string without blank
@@ -160,7 +173,20 @@ func main() {
 
 	r.NoRoute(handler.Error404Handler)
 
-	//r.Run("127.0.0.1:8080")
-	r.Run("0.0.0.0:80")
+	if flag == "-l" {
+		r.Run("127.0.0.1:8080")
+	} else {
+		r.Run("0.0.0.0:80")
+	}
 
+}
+
+func isFlagPassed(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
 }
