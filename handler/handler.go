@@ -30,7 +30,7 @@ var planService *mongo.PlanService
 var session *mongo.Session
 
 func InitHandler() {
-	session, err := mongo.NewSession(":27017")
+	session, err := mongo.NewSession("mongo:27017")
 	if err != nil {
 		log.Fatalf("Unable to connect to mongo: %s", err)
 	}
