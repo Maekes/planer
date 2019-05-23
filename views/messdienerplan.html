@@ -40,7 +40,7 @@
 
             <div class="form-footer">
               <button submit class="btn btn-success btn-block"> <i class="fe fe-chevrons-right"></i> Anlegen &
-                Bearbeiten</button>
+                Messdiener eintragen</button>
             </div>
           </form>
 
@@ -63,7 +63,7 @@
             <a href="/messdienerplan/pdf/{{.UUID}}" class="btn btn-outline-danger btn-sm"><i
                 class="fa fa-file-pdf-o"></i> PDF</a>
             <a href="/zuordnen/{{.UUID}}" class="btn btn-outline-secondary btn-sm ml-2"><i class="fe fe-edit"></i>
-              Bearbeiten</a>
+              Messdiener eintragen</a>
             <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
           </div>
         </div>
@@ -74,7 +74,7 @@
             sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
             sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
             clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-          <p class="leading-tight text-right"><a href="#" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Plan
+          <p class="leading-tight text-right"><a href="/messdienerplan/delete/{{ .UUID}}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Plan
               Löschen</a></p>
         </div>
       </div>

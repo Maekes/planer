@@ -21,7 +21,7 @@
               placeholder="" data-language="de" data-position="right top" placeholder="01.02.2019 11:30" required />
           </div>
           <script>
-           
+
             function edit(Datum, Uhrzeit, Gottesdienst, LiturgischerTag, Bemerkung, UUID) {
               console.log(Datum)
               document.getElementById("textfieldGottesdienst").value = Gottesdienst
@@ -29,7 +29,7 @@
               document.getElementById("textfieldTag").value = LiturgischerTag
               document.getElementById("textfieldUUID").value = UUID
               document.getElementById("datepicker").value = Datum + " " + Uhrzeit
-              
+
             }
           </script>
           <div class="form-group">
@@ -56,41 +56,45 @@
         </div>
       </form>
 
-        <form class="card" id="uploadForm" method="POST" action="/messen/importFromExcel" enctype="multipart/form-data">
-          <div class="card-status  card-status bg-green"></div>
-          <div class="card-header">
-            <h3 class="card-title"><i class="fa fa-table"></i> Messen aus Exceltabelle hinzufügen</h3>
-          </div>
-          <div class="card-body">
-            <p>Ein bestehender Messplan, kann auch als Exceldatei importiert werden. Dafür muss die Datei im 
-              <b>.xls</b> (nicht .xlsx) Format vorliegen und nach folgendem Schema aufgebaut sein:</p>
-              <img class="card-img" src="/assets/images/excel.png" alt="">
-            </div>          
-          <div class="card-footer text-right">
-            <input name="file" type="file" id="file" accept="application/vnd.ms-excel" hidden>
-            <label for="file" class="btn btn-green"><i class="fe fe-upload"></i> Excel-Datei hochladen</label>
-          </div>
-        </form>
+      <form class="card" id="uploadForm" method="POST" action="/messen/importFromExcel" enctype="multipart/form-data">
+        <div class="card-status  card-status bg-green"></div>
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-table"></i> Messen aus Exceltabelle hinzufügen</h3>
+        </div>
+        <div class="card-body">
+          <p>Ein bestehender Messplan, kann auch als Exceldatei importiert werden. Dafür muss die Datei im
+            <b>.xls</b> (nicht .xlsx) Format vorliegen und nach folgendem Schema aufgebaut sein:</p>
+          <img class="card-img" src="/assets/images/excel.png" alt="">
+        </div>
+        <div class="card-footer text-right">
+          <input name="file" type="file" id="file" accept="application/vnd.ms-excel" hidden>
+          <label for="file" class="btn btn-green"><i class="fe fe-upload"></i> Excel-Datei hochladen</label>
+        </div>
+      </form>
 
-        <form class="card" method="POST" action="/messen/deleteAll">
-          <div class="card-status  card-status bg-red"></div>
-          <div class="card-header">
-            <h3 class="card-title"><i class="fe fe-trash-2"></i> Alle Messen löschen</h3>
+      <form  method="POST" action="/messen/deleteAll">
+        <div class="card card-collapsed">
+        <div class="card-status card-status bg-red"></div>
+        <div class="card-header">
+          <h3 class="card-title"><i class="fe fe-trash-2"></i> Alle Messen löschen</h3>
+          <div class="card-options">
+            <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
           </div>
-          <div class="card-body">
-            <p>Lorem Ipsum</p>
-        
-            </div>          
-          <div class="card-footer text-right">
-            <button submit class="btn btn-red"><i class="fe fe-trash-2"></i> Alle Messen Löschen</button>
-          </div>
-        </form>
-  
-        <script>
-          document.getElementById("file").onchange = function () {
-            document.getElementById("uploadForm").submit();
-          };</script>
-  
+        </div>
+        <div class="card-body">
+          <p>Mit einem Klick werden sofort alle angelegten Messen gelöscht. <b>Achtung:</b> Auch bereits erstellte Pläne können nicht mehr korrekt bearbeitet oder als PDF heruntergeladen werden!</p>
+        </div>
+        <div class="card-footer text-right">
+          <button submit class="btn btn-red"><i class="fe fe-trash-2"></i> Alle Messen Löschen</button>
+        </div>
+        </div>
+      </form>
+
+      <script>
+        document.getElementById("file").onchange = function () {
+          document.getElementById("uploadForm").submit();
+        };</script>
+
       </form>
     </div>
     <div class="col-lg-9">

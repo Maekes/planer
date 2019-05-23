@@ -134,6 +134,7 @@ func ZuordnenHandler(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "zuordnen", gin.H{
 		"title":         "Messen",
+		"username":      userService.GetUsernameByID(miniService.AktUser),
 		"UUID":          p.UUID,
 		"messenPayload": messen,
 		"minisPayload":  minis,
@@ -149,6 +150,7 @@ func MessdienerplanHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "messdienerplan", gin.H{
 		"title":       "Messdienerplan",
 		"planPayload": plan,
+		"username":    userService.GetUsernameByID(miniService.AktUser),
 	})
 }
 func MessdienerplanCreateHandler(c *gin.Context) {
@@ -388,10 +390,11 @@ func MinisHandler(c *gin.Context) {
 func MessenHandler(c *gin.Context) {
 	data, _ := messeService.GetAllMessen() //GetAllMessenFromDate(time.Now().AddDate(0, 0, -7))
 	c.HTML(http.StatusOK, "messen", gin.H{
-		"title":   "Messen",
-		"payload": data,
-		"from":    time.Now().Format("2006-01-02"),
-		"to":      time.Now().Format("2006-01-02"),
+		"title":    "Messen",
+		"payload":  data,
+		"username": userService.GetUsernameByID(miniService.AktUser),
+		"from":     time.Now().Format("2006-01-02"),
+		"to":       time.Now().Format("2006-01-02"),
 	})
 }
 
@@ -417,11 +420,21 @@ func MessenfromtoDateHandler(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusFound, "/messen", gin.H{
-		"title":   "Messen",
-		"payload": data,
-		"from":    c.PostForm("from"),
-		"to":      c.PostForm("to"),
+		"title":    "Messen",
+		"payload":  data,
+		"username": userService.GetUsernameByID(miniService.AktUser),
+		"from":     c.PostForm("from"),
+		"to":       c.PostForm("to"),
 	})
+}
+
+func MessdienerplanDeleteHandler(c *gin.Context) {
+	idToSreach, err := uuid.FromString(c.Param("id"))
+	if err != nil {
+		c.Redirect(http.StatusFound, "/messdienerplan")
+	}
+	planService.DeletePlanById(idToSreach)
+	c.Redirect(http.StatusFound, "/messdienerplan")
 }
 
 func MessenDeleteHandler(c *gin.Context) {

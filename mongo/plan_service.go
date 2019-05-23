@@ -40,8 +40,7 @@ func (p *PlanService) GetPlanByUUID(UId uuid.UUID) (*PlanModel, error) {
 	return &results, err
 }
 
-func (p *PlanService) DeletePlanById(Id string) error {
-	uid, err := uuid.FromString(Id)
-	err = p.collection.Remove(bson.M{"uuid": uid, "useruuid": p.aktUser})
+func (p *PlanService) DeletePlanById(uid uuid.UUID) error {
+	err := p.collection.Remove(bson.M{"uuid": uid, "useruuid": p.aktUser})
 	return err
 }
