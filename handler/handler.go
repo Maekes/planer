@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -29,7 +30,7 @@ var planService *mongo.PlanService
 var session *mongo.Session
 
 func InitHandler() {
-	session, err := mongo.NewSession("localhost:27017")
+	session, err := mongo.NewSession(":27017")
 	if err != nil {
 		log.Fatalf("Unable to connect to mongo: %s", err)
 	}
@@ -617,6 +618,7 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 				if row.Col(0) == "" {
 					break
 				}
+				fmt.Println(row.Col(1))
 				d, err := time.ParseInLocation("2006-01-02T15:04:05Z", row.Col(1), l)
 				u, err := time.ParseInLocation("15:04", row.Col(2), l)
 				t, err := strconv.ParseFloat(row.Col(2), 32)
