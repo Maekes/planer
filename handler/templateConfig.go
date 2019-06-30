@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"html/template"
+	"strings"
 	"time"
 
 	"github.com/foolin/goview"
@@ -62,6 +64,21 @@ func GetTemplateConfig() *ginview.ViewEngine {
 				}
 				return messeService.CountMiniInMessen(plan.Von, plan.Bis, m)
 			},
+			"getMessen": func(f time.Time, t time.Time) string {
+				var output []string
+				messen, err := messeService.GetAllMessenThatAreRelevantFromToDate(f, t)
+				if err != nil {
+					//TODO
+					fmt.Print("error in getMessen")
+				}
+				for _, messe := range *messen {
+					output = append(output, toGermanShort(messe.Datum.Format("Mon")))
+					output = append(output, messe.Datum.Format(" 02.01 - 15:04 - "))
+					output = append(output, messe.Gottesdienst)
+					output = append(output, "\n")
+				}
+				return strings.Join(output, "")
+			},
 		},
 		DisableCache: true,
 	})
@@ -83,6 +100,27 @@ func toGerman(d string) string {
 		return "Samstag"
 	case "Sun":
 		return "Sonntag"
+	default:
+		return d
+	}
+}
+
+func toGermanShort(d string) string {
+	switch d {
+	case "Mon":
+		return "Mo"
+	case "Tue":
+		return "Di"
+	case "Wed":
+		return "Mi"
+	case "Thu":
+		return "Do"
+	case "Fri":
+		return "Fr"
+	case "Sat":
+		return "Sa"
+	case "Sun":
+		return "So"
 	default:
 		return d
 	}

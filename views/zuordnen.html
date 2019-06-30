@@ -1,7 +1,7 @@
 {{define "content"}}
 
 
-<div class="container">
+<div class="container" onclick="removeMarking()">
     <div class="page-header">
 
 
@@ -18,7 +18,7 @@
     <div class="row row-cards">
         <div class="col-md-8">
             {{range $index, $value := .messenPayload}}
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-status card-status-left bg-blue"></div>
                 <div class="card-header ">
                     <div class="col-md-4">
@@ -44,17 +44,18 @@
                     </div>
                 </div>
 
-                <div class="card-body" id="{{.UUID}}" ondrop="handleDrop(event, this)">
+                <div class="card-body pt-3 pb-2" style="min-height: 40px" id="{{.UUID}}"
+                    ondrop="handleDrop(event, this)">
                     <div class="tags">
                         {{if not .MinisForPlan}}
 
                         {{else}}
                         {{range $index, $value := .MinisForPlan}}
 
-                        <span class="tag" name="{{$value}}">
-                            <h4 class="m-1 pr-1">{{getMiniNameFromUUID $value}}</h4>
-                            <h4 style="cursor: pointer;" class="m-0 pt-1 pr-2 pl-2 avatar-{{getMiniGruppeUUID $value}}"
-                                onclick="deleteMiniFromMesse(this);">X</h4>
+                        <span class="tag" name="{{$value}}" onclick="markMiniAtMesse(this)">
+                            <h5 class="m-1 pr-1">{{getMiniNameFromUUID $value}}</h5>
+                            <h5 style="cursor: pointer;" class="m-0 pt-1 pr-2 pl-2 avatar-{{getMiniGruppeUUID $value}}"
+                                onclick="deleteMiniFromMesse(this);">X</h5>
                         </span>
 
                         {{end}}
@@ -66,13 +67,12 @@
         </div>
         <div class="col-md-4">
             <div class="affix position-fixed" style="overflow-y:scroll; height:60%;">
-
                 {{range $index, $value := .minisPayload}}
                 <div class="tags mb-5">
                     {{range $index, $value := $value}}
-                    <span class="tag" id="{{.UUID}}" draggable="true">
-                        <h4 class="m-1 pr-1">{{.Vorname}} {{.Nachname}}</h4>
-                        <h4 class="m-0 pt-1 pr-2 pl-2 avatar-{{.Gruppe}}"> {{countInPlan .UUID $.UUID}}</h4>
+                    <span class="col tag" id="{{.UUID}}" draggable="true" onclick="markMini(this)">
+                        <h5 class="m-0 pt-1 pr-2 pl-2 avatar-{{.Gruppe}}"> {{countInPlan .UUID $.UUID}}</h5>
+                        <h5 class="m-1 pr-1">{{.Nachname}}, {{.Vorname}}</h5>
                     </span>
                     {{end}}
                 </div>
@@ -104,7 +104,7 @@
         const xhttp = new XMLHttpRequest();
         uid = e.parentNode.getAttribute("name");
         from = e.parentNode.parentNode.parentNode.id
-        document.getElementById(uid).lastElementChild.innerHTML--
+        document.getElementById(uid).firstElementChild.innerHTML--
         xhttp.open("POST", "/zuordnen/delete?uid=" + uid + "&from=" + from);
         xhttp.send();
         xhttp.onreadystatechange = function () {
@@ -115,6 +115,49 @@
                 alert("Konnte keine Verbindung zum Server aufbauen!\nStatus bleibt unverändert.")
             }
         }
+    }
+
+    var marked = false
+
+    function markMini(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation()
+        }
+        removeMarking()
+        e.classList.add("tag-success")
+        var element = document.getElementsByName(e.id);
+        for (var i = 0; i < element.length; i++) {
+                element[i].classList.add('tag-success')
+            }
+        marked = true
+    }
+
+    function markMiniAtMesse(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation()
+        }
+        removeMarking()
+        e.classList.add("tag-success")
+        
+        document.getElementById(e.getAttribute("name")).classList.add('tag-success');
+        var element = document.getElementsByName(e.getAttribute("name"));
+        for (var i = 0; i < element.length; i++) {
+                element[i].classList.add('tag-success')
+            }
+        marked = true
+    }
+
+    function removeMarking() {
+        if (!marked) {
+            var element = document.getElementsByClassName("tag-success");
+            while (element.length > 0) {
+                element[0].classList.remove('tag-success')
+            }
+        }else{
+            marked = false
+        }
+ 
+        console.log("Test")
     }
 
 
@@ -161,17 +204,18 @@
         xhttp.onreadystatechange = function () {
 
             if (this.readyState == 4 && this.status == 200) {
-                document.getElementById(data).lastElementChild.innerHTML++
+                document.getElementById(data).firstElementChild.innerHTML++
                 var nodeCopy = document.getElementById(data).cloneNode(true)
                 nodeCopy.style.opacity = '1'
 
                 nodeCopy.setAttribute('draggable', false);
                 nodeCopy.setAttribute('name', nodeCopy.id);
+                nodeCopy.setAttribute("onclick", "markMiniAtMesse(this);");
                 nodeCopy.id = ''
 
                 var child_nodes = nodeCopy.childNodes;
-                var first = child_nodes[1];
-                var second = child_nodes[3];
+                var first = child_nodes[3];
+                var second = child_nodes[1];
 
                 nodeCopy.innerHTML = '';
 
@@ -184,6 +228,7 @@
                 second.setAttribute("onclick", "deleteMiniFromMesse(this);");
                 nodeCopy.appendChild(first);
                 nodeCopy.appendChild(second);
+                nodeCopy.classList.remove("col");
 
 
                 el.childNodes[1].appendChild(nodeCopy);

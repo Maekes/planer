@@ -306,27 +306,6 @@ func MessdienerplanPdfHandler(c *gin.Context) {
 
 }
 
-func toGermanShort(d string) string {
-	switch d {
-	case "Mon":
-		return "Mo"
-	case "Tue":
-		return "Di"
-	case "Wed":
-		return "Mi"
-	case "Thu":
-		return "Do"
-	case "Fri":
-		return "Fr"
-	case "Sat":
-		return "Sa"
-	case "Sun":
-		return "So"
-	default:
-		return d
-	}
-}
-
 func ZuordnenDragedHandler(c *gin.Context) {
 	from := c.Query("from")
 	to := c.Query("to")
