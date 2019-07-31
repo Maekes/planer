@@ -66,9 +66,14 @@
             {{end}}
         </div>
         <div class="col-md-4">
+            
             <div class="affix position-fixed" style="overflow-y:scroll; height:60%;">
+                <label class="form-label">Sortieren nach:</label>
+                <button type="button" id="sortName" class="btn btn-outline-primary btn-sm"><i class="fa fa-sort-alpha-asc mr-2"></i>Name</button>
+                <button type="button" id="sortGroup" class="btn btn-primary btn-sm"><i class="fa fa-group mr-2"></i>Gruppe</button>
+        
                 {{range $index, $value := .minisPayload}}
-                <div class="tags mb-5">
+                <div class="tags mt-5 mb-5">
                     {{range $index, $value := $value}}
                     <span class="col tag" id="{{.UUID}}" draggable="true" onclick="markMini(this)">
                         <h5 class="m-0 pt-1 pr-2 pl-2 avatar-{{.Gruppe}}"> {{countInPlan .UUID $.UUID}}</h5>
@@ -77,6 +82,7 @@
                     {{end}}
                 </div>
                 {{end}}
+                
             </div>
         </div>
     </div>
@@ -124,10 +130,10 @@
             e.stopPropagation()
         }
         removeMarking()
-        e.classList.add("tag-success")
+        e.classList.add("tag-lime")
         var element = document.getElementsByName(e.id);
         for (var i = 0; i < element.length; i++) {
-                element[i].classList.add('tag-success')
+                element[i].classList.add('tag-lime')
             }
         marked = true
     }
@@ -137,21 +143,21 @@
             e.stopPropagation()
         }
         removeMarking()
-        e.classList.add("tag-success")
+        e.classList.add("tag-lime")
         
-        document.getElementById(e.getAttribute("name")).classList.add('tag-success');
+        document.getElementById(e.getAttribute("name")).classList.add('tag-lime');
         var element = document.getElementsByName(e.getAttribute("name"));
         for (var i = 0; i < element.length; i++) {
-                element[i].classList.add('tag-success')
+                element[i].classList.add('tag-lime')
             }
         marked = true
     }
 
     function removeMarking() {
         if (!marked) {
-            var element = document.getElementsByClassName("tag-success");
+            var element = document.getElementsByClassName("tag-lime");
             while (element.length > 0) {
-                element[0].classList.remove('tag-success')
+                element[0].classList.remove('tag-lime')
             }
         }else{
             marked = false

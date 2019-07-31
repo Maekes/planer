@@ -53,6 +53,10 @@ func RegisterHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "register.html", gin.H{"Title": "Register"})
 }
 
+func RueckmeldungFormHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "rueckmeldung-form.html", nil)
+}
+
 type Register struct {
 	Name           string `form:"name"  binding:"required"`
 	Mail           string `form:"mail" binding:"required,email"`

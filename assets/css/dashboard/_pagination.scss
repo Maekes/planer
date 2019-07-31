@@ -1,0 +1,34 @@
+.pagination-simple {
+	.page-item {
+		.page-link {
+			background: none;
+			border: none;
+		}
+
+		&.active .page-link {
+			color: $pagination-color;
+			font-weight: 700;
+		}
+	}
+}
+
+.pagination-pager {
+	.page-prev {
+		margin-right: auto;
+	}
+
+	.page-next {
+		margin-left: auto;
+	}
+}
+
+.page-total-text {
+	margin-right: 1rem;
+	align-self: center;
+	color: $text-muted-dark;
+}
+
+.page-main {
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+  }
