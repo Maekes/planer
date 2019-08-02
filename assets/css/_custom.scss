@@ -1,0 +1,48 @@
+/* The sticky class is added to the header with JS when it reaches its scroll position */
+
+$nameListHeight: 30vh;
+$nameListHeightFixed: 80vh;
+
+.stickyNameList {
+    position: relative;
+    top: 0;
+    height: $nameListHeight;
+  
+}
+
+.stickyNameListFixed {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+    height: $nameListHeightFixed;
+    
+} 
+
+.stickyNameScroll{
+  overflow-y: scroll;
+  position: relative;
+  height: $nameListHeight;
+}
+
+.stickyNameScrollFixed{
+  overflow-y: scroll;
+  position: relative;
+  height: $nameListHeightFixed;
+}
+
+
+.hideCard{
+  position: absolute !important;
+  visibility: hidden;
+}
+
+
+.tag-outline-darkgray{
+  background-color: $white !important;
+  border-color: $gray-900;
+  border-width: 1px;
+  border-style: solid;
+  color: $gray-900 !important;
+}
+
+

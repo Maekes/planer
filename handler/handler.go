@@ -54,7 +54,47 @@ func RegisterHandler(c *gin.Context) {
 }
 
 func RueckmeldungFormHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "rueckmeldung-form.html", nil)
+	uuid, err := uuid.FromString("2f61e216-a720-413f-b99a-d2151d7149e0")
+	p, err := planService.GetPlanByUUIDPublic(uuid)
+	messen, err := messeService.GetAllMessenThatAreRelevantFromToDatePublic(p.Von, p.Bis)
+
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	c.HTML(http.StatusOK, "rueckmeldung-form.html", gin.H{
+		"title":         "Messen",
+		"messenPayload": messen,
+		"planTitle":     p.Titel,
+		"planID":        p.UUID,
+		"from":          p.Von.Format("02.01.2006"),
+		"to":            p.Bis.Format("02.01.2006"),
+	})
+
+}
+
+func RueckmeldungPostFormHandler(c *gin.Context) {
+	name := c.PostForm("name")
+	messen := c.PostFormArray("uuid")
+	hinweis := c.PostForm("hinweis")
+	uid := c.PostForm("planid")
+	planid, err := uuid.FromString(uid)
+
+	if err != nil {
+		//TODO
+	}
+
+	planService.NewRueckmeldungPublic(name, messen, hinweis, planid)
+
+	for _, m := range messen {
+		uid, err := uuid.FromString(m)
+		if err != nil {
+			log.Println(err)
+		}
+		messeService.AddNameToMessePublic(name, uid)
+	}
+
+	c.Redirect(http.StatusFound, "/rueckmeldung")
 }
 
 type Register struct {
@@ -127,24 +167,46 @@ func ZuordnenHandler(c *gin.Context) {
 	messen, _ := messeService.GetAllMessenThatAreRelevantFromToDate(p.Von, p.Bis)
 	groups := []string{"gray", "azure", "indigo", "purple", "pink", "red", "orange", "yellow", "lime"}
 	var minis [][]mongo.MiniModel
-	for _, v := range groups {
-		m, err := miniService.GetAllMinisFromGroup(v)
-		log.Println(m)
+
+	sortingOrder := c.Query("sortBy")
+	log.Println(sortingOrder)
+	switch sortingOrder {
+	case "group":
+		for _, v := range groups {
+			m, err := miniService.GetAllMinisFromGroup(v)
+			if err != nil {
+				//TODO
+			}
+			minis = append(minis, *m)
+		}
+	case "name":
+		m, err := miniService.GetAllMinis()
 		if err != nil {
 			//TODO
 		}
 		minis = append(minis, *m)
+	default: //defalut Case is equal to group Case
+		sortingOrder = "group"
+		for _, v := range groups {
+			m, err := miniService.GetAllMinisFromGroup(v)
+			if err != nil {
+				//TODO
+			}
+			minis = append(minis, *m)
+		}
 	}
 
 	c.HTML(http.StatusOK, "zuordnen", gin.H{
-		"title":         "Messen",
-		"username":      userService.GetUsernameByID(miniService.AktUser),
-		"UUID":          p.UUID,
-		"messenPayload": messen,
-		"minisPayload":  minis,
-		"planTitle":     p.Titel,
-		"from":          p.Von.Format("02.01.2006"),
-		"to":            p.Bis.Format("02.01.2006"),
+		"title":          "Messen",
+		"username":       userService.GetUsernameByID(miniService.AktUser),
+		"UUID":           p.UUID,
+		"messenPayload":  messen,
+		"minisPayload":   minis,
+		"planTitle":      p.Titel,
+		"rueckmeldungen": p.Rueckmeldungen,
+		"from":           p.Von.Format("02.01.2006"),
+		"to":             p.Bis.Format("02.01.2006"),
+		"sortBy":         sortingOrder,
 	})
 }
 

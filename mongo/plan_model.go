@@ -10,13 +10,22 @@ import (
 )
 
 type PlanModel struct {
-	Id       bson.ObjectId `bson:"_id,omitempty"`
-	UUID     uuid.UUID
-	Erstellt time.Time
-	Von      time.Time
-	Bis      time.Time
-	Titel    string
-	UserUUID uuid.UUID
+	Id             bson.ObjectId `bson:"_id,omitempty"`
+	UUID           uuid.UUID
+	Erstellt       time.Time
+	Von            time.Time
+	Bis            time.Time
+	Titel          string
+	UserUUID       uuid.UUID
+	Rueckmeldungen []Rueckmeldung
+}
+
+type Rueckmeldung struct {
+	Name    string
+	UUID    uuid.UUID
+	Hinweis string
+	Zeit    time.Time
+	Messen  []uuid.UUID
 }
 
 func planModelIndex() mgo.Index {

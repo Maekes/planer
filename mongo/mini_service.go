@@ -48,7 +48,6 @@ func (p *MiniService) GetMiniByUUID(UId uuid.UUID) (*MiniModel, error) {
 }
 
 func (p *MiniService) UpdateMini(m *MiniModel) error {
-
 	err := p.collection.Update(bson.M{"uuid": m.UUID}, &m)
 	return err
 }

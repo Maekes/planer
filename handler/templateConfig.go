@@ -40,6 +40,9 @@ func GetTemplateConfig() *ginview.ViewEngine {
 			"getDay": func(t time.Time) string {
 				return toGerman(t.Format("Mon"))
 			},
+			"getDayShort": func(t time.Time) string {
+				return toGermanShort(t.Format("Mon"))
+			},
 			"getMiniNameFromUUID": func(u uuid.UUID) string {
 				m, err := miniService.GetMiniByUUID(u)
 				if err != nil {

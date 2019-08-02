@@ -50,6 +50,14 @@ func (p *MesseService) UpdateMesse(m *MesseModel) error {
 	return err
 }
 
+func (p *MesseService) AddNameToMessePublic(n string, uid uuid.UUID) error {
+	var m MesseModel
+	err := p.collection.Find(bson.M{"uuid": uid}).One(&m)
+	m.Rueckmeldungen = append(m.Rueckmeldungen, n)
+	err = p.collection.Update(bson.M{"uuid": m.UUID}, &m)
+	return err
+}
+
 func (p *MesseService) GetAllMessenFromDate(fromDate time.Time) (*[]MesseModel, error) {
 	var results []MesseModel
 	err := p.collection.Find(
@@ -106,6 +114,20 @@ func (p *MesseService) GetAllMessenThatAreRelevantFromToDate(fromDate, toDate ti
 			},
 			"isrelevant": true,
 			"useruuid":   p.aktUser,
+		}).Sort("datum").All(&results)
+	return &results, err
+
+}
+
+func (p *MesseService) GetAllMessenThatAreRelevantFromToDatePublic(fromDate, toDate time.Time) (*[]MesseModel, error) {
+	var results []MesseModel
+	err := p.collection.Find(
+		bson.M{
+			"datum": bson.M{
+				"$gt": fromDate,
+				"$lt": toDate,
+			},
+			"isrelevant": true,
 		}).Sort("datum").All(&results)
 	return &results, err
 

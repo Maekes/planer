@@ -13,83 +13,129 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
     <!-- Generated: 2018-04-16 09:29:05 +0200 -->
     <title>{{.Title}}</title>
     <!-- Password strenght checker -->
-    <script type="text/javascript" src="/assets/js/zxcvbn.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i,500,500i,600,600i,700,700i&amp;subset=latin-ext">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"
-        integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/css/datepicker.min.css"
-        integrity="sha256-q0wZgzQ6Ru67x+pIe9IAztrnlHNHyZui3BMwqUYDnpI=" crossorigin="anonymous" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/js/datepicker.min.js"
-        integrity="sha256-0prQxFtdWQNa3vW5JDMbvbBp6ehKzf9UIWqFGZIWPPE=" crossorigin="anonymous"></script>
 
-    <!-- Include German language -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/js/i18n/datepicker.de.min.js"
-        integrity="sha256-l48pLHOWxz3HbZ381N8puEqfEzkrN7aCh+RtmVAIJlo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <script src="/assets/js/require.min.js"></script>
-    <script>
-        requirejs.config({
-            baseUrl: '.'
-        });
-    </script>
+    <style>
+        .checkbox label:after,
+        .radio label:after {
+            content: '';
+            display: table;
+            clear: both;
+        }
 
-    <!-- Dashboard Core -->
-    <link href="/assets/css/dashboard.css" rel="stylesheet" />
-    <script src="/assets/js/dashboard.js"></script>
-    <!-- c3.js Charts Plugin -->
-    <link href="/assets/plugins/charts-c3/plugin.css" rel="stylesheet" />
-    <script src="/assets/plugins/charts-c3/plugin.js"></script>
-    <!-- Google Maps Plugin -->
-    <link href="/assets/plugins/maps-google/plugin.css" rel="stylesheet" />
-    <script src="/assets/plugins/maps-google/plugin.js"></script>
-    <!-- Input Mask Plugin -->
-    <script src="/assets/plugins/input-mask/plugin.js"></script>
-    <!-- Custom Scripts -->
-    <script src="/assets/js/scripts.js"></script>
+        .checkbox .cr,
+        .radio .cr {
+            position: relative;
+            display: inline-block;
+            border: 2px solid #670000;
+            color: #670000;
+            border-radius: 1em;
+            width: 1.4em;
+            height: 1.4em;
+            float: left;
+            margin-right: .7em;
+            margin-top: 1px;
+        }
 
+        .radio .cr {
+            border-radius: 50%;
+        }
 
+        .checkbox .cr .cr-icon,
+        .radio .cr .cr-icon {
+            position: absolute;
+            font-size: .8em;
+            line-height: 0;
+            top: 50%;
+            left: 20%;
+        }
 
+        .radio .cr .cr-icon {
+            margin-left: 0.0em;
+        }
+
+        .checkbox label input[type="checkbox"],
+        .radio label input[type="radio"] {
+            display: none;
+        }
+
+        .checkbox label input[type="checkbox"]+.cr>.cr-icon,
+        .radio label input[type="radio"]+.cr>.cr-icon {
+  
+            opacity: 0;
+        }
+
+        .checkbox label input[type="checkbox"]:checked+.cr>.cr-icon,
+        .radio label input[type="radio"]:checked+.cr>.cr-icon {
+  
+            opacity: 1;
+        }
+
+        .checkbox label input[type="checkbox"]:disabled+.cr,
+        .radio label input[type="radio"]:disabled+.cr {
+            opacity: .5;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-              <label class="form-label">Name / Namen</label>
-              <input type="text" class="form-control" placeholder="Vor- und Nachnamen">
+    <h2>Messdienerplan {{.planTitle}} | Rückmeldung</h2>
+
+    <p> Bitte bis <b>Sonntag 7. Juli</b> eintragen wann ihr dienen könntet.</p>
+    <form action="/rueckmeldung" method="POST">
+        <div class="form-group row m-0 mb-4 mt-4">
+            <input type="text" class="custom-control-input" name="planid" hidden value="{{.planID}}">
+            <label for="name" class="col-3 pl-0 col-form-label font-weight-bold">Name / Namen</label>
+            <div class="col-9 pr-0">
+                <input id="name" name="name" type="text" required="required" class="form-control"
+                    placeholder="Vor- und Nachnamen">
             </div>
         </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <div class="form-label">Wunschmessen</div>
+        <div class="form-group row m-0">
+            <label class="col-3 pl-0 col-form-label font-weight-bold">Wunschmessen</label>
+            <div class="col-9 pr-0">
+
+                {{range $index, $value := .messenPayload}}
+                
+
+                <div class="checkbox">
+                        <label style="font-size: 1.1em">
+                            <input type="checkbox" value="{{.UUID}}">
+                            <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                            {{getDayShort .Datum}}
+                            {{getDate .Datum}} -
+                            {{getTime .Datum}} - {{.Gottesdienst}} {{if eq .InfoForPlan ""}} {{else}} ({{.InfoForPlan}})
+                            {{end}}
+                        </label>
+                    </div>
+                {{end}}
+
               
 
-                  <label class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="example-checkbox2" value="option2">
-                    <span class="custom-control-label">Option 2</span>
-                  </label>
 
-                  <label class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="example-checkbox2" value="option2">
-                    <span class="custom-control-label">Option 2</span>
-                  </label>
-
-                  <label class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="example-checkbox2" value="option2">
-                    <span class="custom-control-label">Option 2</span>
-                  </label>
-                  
-            
-              </div>
+            </div>
         </div>
-    </div>
+        <div class="form-group row mr-0 ml-0 mt-4">
+            <label for="hinweis" class="col-3 pl-0 col-form-label font-weight-bold">Hinweis / Wunschpartner /
+                Sonstiges</label>
+            <div class="col-9 pr-0">
+                <textarea id="hinweis" name="hinweis" type="text" class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+        <div class="form-group row m-0">
+            <div class="offset-3 col-9 pr-0">
+                <button type="submit" class="btn" style="color: #FFF; background-color: #670000;"><i class="fa fa-send mr-2"></i>Abschicken</button>
+            </div>
+        </div>
+    </form>
 </body>
 
 </html>

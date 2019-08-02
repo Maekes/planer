@@ -141,6 +141,7 @@ func main() {
 	r.POST("/register", handler.RegisterPostHandler)
 
 	r.GET("/rueckmeldung", handler.RueckmeldungFormHandler)
+	r.POST("/rueckmeldung", handler.RueckmeldungPostFormHandler)
 
 	auth := r.Group("/")
 	auth.Use(handler.ValidationMiddleware)

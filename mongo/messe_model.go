@@ -20,7 +20,7 @@ type MesseModel struct {
 	ErforderlicheMinis int
 	InfoForPlan        string
 	MinisForPlan       []uuid.UUID
-	Rueckmeldungen     []MiniModel
+	Rueckmeldungen     []string
 	UserUUID           uuid.UUID
 }
 
