@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Maekes/planer/mongo"
+	"gopkg.in/gomail.v2"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jung-kurt/gofpdf"
@@ -54,12 +56,17 @@ func RegisterHandler(c *gin.Context) {
 }
 
 func RueckmeldungFormHandler(c *gin.Context) {
-	uuid, err := uuid.FromString("2f61e216-a720-413f-b99a-d2151d7149e0")
+
+	uuid, err := uuid.FromString(c.Query("id"))
+	if err != nil {
+		Error404Handler(c)
+		return
+	}
 	p, err := planService.GetPlanByUUIDPublic(uuid)
 	messen, err := messeService.GetAllMessenThatAreRelevantFromToDatePublic(p.Von, p.Bis)
 
 	if err != nil {
-		log.Println(err.Error())
+		//	log.Println(err.Error())
 	}
 
 	c.HTML(http.StatusOK, "rueckmeldung-form.html", gin.H{
@@ -74,6 +81,13 @@ func RueckmeldungFormHandler(c *gin.Context) {
 }
 
 func RueckmeldungPostFormHandler(c *gin.Context) {
+
+	var message string
+	var error bool
+
+	error = false
+	message = "Vielen Dank. Die Rückmeldung wurde verschickt."
+
 	name := c.PostForm("name")
 	messen := c.PostFormArray("uuid")
 	hinweis := c.PostForm("hinweis")
@@ -85,6 +99,9 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	}
 
 	planService.NewRueckmeldungPublic(name, messen, hinweis, planid)
+	plan, err := planService.GetPlanByUUIDPublic(planid)
+
+	mailText := "<h2> Neue Rückmeldung von " + name + "</h2> <p>"
 
 	for _, m := range messen {
 		uid, err := uuid.FromString(m)
@@ -94,7 +111,40 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 		messeService.AddNameToMessePublic(name, uid)
 	}
 
-	c.Redirect(http.StatusFound, "/rueckmeldung")
+	me, err := messeService.GetAllMessenWithUUIDsPublic(messen)
+
+	for _, m := range *me {
+		tag := toGermanShort(m.Datum.Format("Mon"))
+		mailText = mailText + "" + tag + " " + m.Datum.Format("2.1. - 15:04") + " - " + m.Gottesdienst + "   " + m.InfoForPlan + "</br>"
+	}
+
+	mailText = mailText + "</p></br>" + "<b>Hinweis: " + hinweis + "</b>"
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", "leiterrunde@minis-quirin.de")
+	m.SetHeader("To", "leiterrunde@minis-quirin.de")
+	m.SetHeader("Subject", name+" | Rückmeldung Plan "+plan.Titel)
+	m.SetBody("text/html", mailText)
+
+	d := gomail.NewDialer("minis-quirin.de", 465, "leiterrunde@minis-quirin.de", "9.Kugeln")
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+
+	// Send the email
+	/*
+		if err := d.DialAndSend(m); err != nil {
+			error = true
+			message = "Die Nachricht konnte nicht versendet werden. Versuchen Sie es später noch einmal."
+		} else {
+			error = false
+			message = "Vielen Dank. Die Rückmeldung wurde verschickt."
+		}
+	*/
+	time.Sleep(2 * time.Second)
+	c.JSON(200, gin.H{
+		"error":   error,
+		"message": message,
+	})
+
 }
 
 type Register struct {
@@ -169,7 +219,7 @@ func ZuordnenHandler(c *gin.Context) {
 	var minis [][]mongo.MiniModel
 
 	sortingOrder := c.Query("sortBy")
-	log.Println(sortingOrder)
+
 	switch sortingOrder {
 	case "group":
 		for _, v := range groups {
@@ -220,7 +270,7 @@ func MessdienerplanHandler(c *gin.Context) {
 	})
 }
 func MessdienerplanCreateHandler(c *gin.Context) {
-	log.Println(c.PostForm("from"))
+
 	l, err := time.LoadLocation("Europe/Berlin")
 	from, err := time.ParseInLocation("02.01.2006", c.PostForm("from"), l)
 	to, err := time.ParseInLocation("02.01.2006", c.PostForm("to"), l)
@@ -454,7 +504,6 @@ func MessenDeleteToHandler(c *gin.Context) {
 func MessenfromtoDateHandler(c *gin.Context) {
 	from, err := time.Parse("2006-01-02", c.PostForm("from"))
 	to, err := time.Parse("2006-01-02", c.PostForm("to"))
-	log.Println(c.PostForm("from"))
 	l, err := time.LoadLocation("Europe/Berlin")
 
 	fromDate := time.Date(from.Year(), from.Month(), from.Day(), 0, 0, 0, 0, l)
@@ -511,7 +560,6 @@ func AddMessenHandler(c *gin.Context) {
 	t := c.PostForm("tag")
 	b := c.PostForm("bemerkung")
 
-	log.Print(d)
 	if err != nil || g == "" {
 		log.Println(err)
 		c.Redirect(http.StatusFound, "/messen")
@@ -567,7 +615,6 @@ func AddMiniHandler(c *gin.Context) {
 	}
 	if c.PostForm("uuid") == "" {
 		uidm := uuid.NewV4()
-		log.Println(g)
 		mini := mongo.MiniModel{
 			UUID:     uidm,
 			Vorname:  v,
@@ -627,7 +674,6 @@ func AddMiniFromExcelHandler(c *gin.Context) {
 			}
 
 			uid := uuid.NewV4()
-			log.Println(row.Col(0))
 
 			groups := []string{"gray", "azure", "indigo", "purple", "pink", "red", "orange", "yellow", "lime"}
 			gn, err := strconv.Atoi(row.Col(2))

@@ -10,6 +10,7 @@ require (
 	github.com/foolin/goview v0.1.0
 	github.com/gin-gonic/gin v1.3.0
 	github.com/gorilla/sessions v1.1.3 // indirect
+	github.com/jinzhu/now v1.0.1
 	github.com/json-iterator/go v1.1.6 // indirect
 	github.com/jung-kurt/gofpdf v1.4.0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -23,5 +24,6 @@ require (
 	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
 	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
 )

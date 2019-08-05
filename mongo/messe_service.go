@@ -45,6 +45,19 @@ func (p *MesseService) GetMesseByUUID(uid uuid.UUID) (*MesseModel, error) {
 	return &m, err
 }
 
+func (p *MesseService) GetAllMessenWithUUIDsPublic(uids []string) (*[]MesseModel, error) {
+	var m []MesseModel
+	var uidss []uuid.UUID
+	for _, u := range uids {
+		uid, _ := uuid.FromString(u)
+		uidss = append(uidss, uid)
+	}
+
+	err := p.collection.Find(bson.M{"uuid": bson.M{"$in": uidss}}).All(&m)
+
+	return &m, err
+}
+
 func (p *MesseService) UpdateMesse(m *MesseModel) error {
 	err := p.collection.Update(bson.M{"uuid": m.UUID}, &m)
 	return err

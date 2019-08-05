@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"time"
+
 	uuid "github.com/satori/go.uuid"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -76,4 +77,5 @@ func (p *PlanService) NewRueckmeldungPublic(name string, messen []string, hinwei
 	if err != nil {
 		//TODO
 	}
+
 }

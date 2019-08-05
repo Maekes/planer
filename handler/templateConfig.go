@@ -3,11 +3,14 @@ package handler
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"strings"
 	"time"
 
+	"github.com/Maekes/planer/mongo"
 	"github.com/foolin/goview"
 	"github.com/foolin/goview/supports/ginview"
+	"github.com/jinzhu/now"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -82,9 +85,41 @@ func GetTemplateConfig() *ginview.ViewEngine {
 				}
 				return strings.Join(output, "")
 			},
+			"getMessenDividedInWeeks": func(m *[]mongo.MesseModel) *[]Week {
+				var w []Week
+				me := *m
+				if len(me) > 0 {
+					start := me[0].Datum
+					now.WeekStartDay = time.Saturday
+					end := now.New(start).EndOfWeek()
+					var whelper Week
+					for _, messe := range me {
+
+						if messe.Datum.Before(end) {
+							whelper.Messen = append(whelper.Messen, messe)
+						} else {
+							w = append(w, whelper)
+
+							whelper = Week{}
+							start := messe.Datum
+							end = now.New(start).EndOfWeek()
+							whelper.Messen = append(whelper.Messen, messe)
+						}
+					}
+				} else {
+					log.Println("FAFALLLLLLLL ERRORRr")
+					//TODO
+				}
+
+				return &w
+			},
 		},
 		DisableCache: true,
 	})
+}
+
+type Week struct {
+	Messen []mongo.MesseModel
 }
 
 func toGerman(d string) string {
