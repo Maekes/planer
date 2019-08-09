@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
 
 	"github.com/Maekes/planer/handler"
@@ -184,7 +185,7 @@ func main() {
 		//log.Fatal(autotls.Run(r, "localhost"))
 	} else {
 		//r.Run("0.0.0.0:80")
-		autotls.Run(r, "planer.minis-quirin.de", "www.planer.minis-quirin.de")
+		log.Fatal(autotls.Run(r, "planer.minis-quirin.de", "www.planer.minis-quirin.de"))
 	}
 
 }
