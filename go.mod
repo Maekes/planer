@@ -20,6 +20,7 @@ require (
 	github.com/jinzhu/now v1.0.1
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/jung-kurt/gofpdf v1.5.4
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.8 // indirect
 	github.com/nkovacs/streamquote v1.0.0 // indirect
 	github.com/phpdave11/gofpdi v1.0.5 // indirect

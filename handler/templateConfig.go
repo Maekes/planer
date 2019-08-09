@@ -87,6 +87,7 @@ func GetTemplateConfig() *ginview.ViewEngine {
 			},
 			"getMessenDividedInWeeks": func(m *[]mongo.MesseModel) *[]Week {
 				var w []Week
+
 				me := *m
 				if len(me) > 0 {
 					start := me[0].Datum
@@ -106,8 +107,9 @@ func GetTemplateConfig() *ginview.ViewEngine {
 							whelper.Messen = append(whelper.Messen, messe)
 						}
 					}
+					w = append(w, whelper)
 				} else {
-					log.Println("FAFALLLLLLLL ERRORRr")
+					log.Println("FAFALLLLLLLL ERRORRR")
 					//TODO
 				}
 
