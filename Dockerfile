@@ -23,7 +23,7 @@ WORKDIR /go/src/github.com/Maekes/planer
 RUN go install
 # RUN go build -o goapp
 # Build the binary
-CMD ["planer"]
+CMD ["planer -notls"]
 
 # FROM alpine 
 # COPY --from=build-env /go/src/github.com/Maekes/planer/goapp /app/
