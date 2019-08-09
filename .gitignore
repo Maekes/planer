@@ -6,5 +6,5 @@
 /bin
 DOCKERFILE
 *.yml
-.crt
-.key
+*.crt
+*.key
