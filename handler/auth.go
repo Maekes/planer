@@ -61,7 +61,7 @@ func ValidateJwtLoginHandler(c *gin.Context) {
 	jwtsession.SetFlash(c, "success : successful login")
 	jwtsession.SetFlash(c, "username : "+form.Username)
 
-	c.Redirect(http.StatusFound, "/messdienerplan")
+	c.Redirect(http.StatusSeeOther, "/messdienerplan")
 	return
 }
 
