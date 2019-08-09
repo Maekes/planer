@@ -40,6 +40,9 @@ func GetTemplateConfig() *ginview.ViewEngine {
 			"getTime": func(t time.Time) string {
 				return t.Format("15:04")
 			},
+			"getDayTime": func(t time.Time) string {
+				return t.Format("02.01.2006 - 15:04:05")
+			},
 			"getDay": func(t time.Time) string {
 				return toGerman(t.Format("Mon"))
 			},

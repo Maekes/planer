@@ -1,0 +1,133 @@
+{{define "content"}}
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">
+            Administration
+        </h1>
+    </div>
+    <div class="row ">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-status card-status-left bg-green"></div>
+                <div class="card-header">
+                    <h3 class="card-title">Nutzer</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable">
+                        <thead>
+                            <tr>
+                                <th>UUID</th>
+                                <th>Status</th>
+                                <th>Username</th>
+                                <th>E-Mail</th>
+                                <th>Role</th>
+                                <th>Erstellt am</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range $index, $value := .user}}
+                            <tr>
+                                <td><span class="text-muted small"></span></td>
+                                <td>
+                                    {{if .Active}}
+                                    <span class="status-icon bg-green"></span> Aktiv
+                                    {{else}}
+                                    <span class="status-icon bg-danger"></span> Gesperrt
+                                    {{end}}
+                                </td>
+                                <td>
+                                    {{.Username}}
+                                </td>
+                                <td>
+                                    {{.Mail}}
+                                </td>
+                                <td>
+                                    {{.Role}}
+                                </td>
+                                <td>
+                                    {{getDayTime .Created}}
+                                </td>
+                                <td>
+                                    <a class="icon" href="/adminArea/user/delete/{{.UUID}}"><i
+                                            class="fe fe-rotate-ccw"></i> Reset Password</a>
+                                </td>
+                                <td>
+
+                                    {{if .Active}}
+                                    <a class="icon" href="/adminArea/user/status/{{.UUID}}?new=block"><i
+                                            class="fe fe-user-x"></i> Sperren</a>
+                                    {{else}}
+                                    <a class="icon" href="/adminArea/user/status/{{.UUID}}?new=unblock"><i
+                                            class="fe fe-user-check"></i> Freigeben</a>
+                                    {{end}}
+                                </td>
+                                <td>
+                                    <a class="icon" href="/adminArea/user/delete/{{.UUID}}">
+                                        <i class="fe fe-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                    <script>
+                        require(['datatables', 'jquery'], function (datatable, $) {
+                            $('.datatable').DataTable({
+                                "language": {
+                                    "sEmptyTable": "Keine Daten in der Tabelle vorhanden",
+                                    "sInfo": "_START_ bis _END_ von _TOTAL_ Einträgen",
+                                    "sInfoEmpty": "Keine Daten vorhanden",
+                                    "sInfoFiltered": "(gefiltert von _MAX_ Einträgen)",
+                                    "sInfoPostFix": "",
+                                    "sInfoThousands": ".",
+                                    "sLengthMenu": "_MENU_ Einträge anzeigen",
+                                    "sLoadingRecords": "Wird geladen ..",
+                                    "sProcessing": "Bitte warten ..",
+                                    "sSearch": "Suchen",
+                                    "sZeroRecords": "Keine Einträge vorhanden",
+                                    "oPaginate": {
+                                        "sFirst": "Erste",
+                                        "sPrevious": "Zurück",
+                                        "sNext": "Nächste",
+                                        "sLast": "Letzte"
+                                    },
+                                    "oAria": {
+                                        "sSortAscending": ": aktivieren, um Spalte aufsteigend zu sortieren",
+                                        "sSortDescending": ": aktivieren, um Spalte absteigend zu sortieren"
+                                    },
+                                    "select": {
+                                        "rows": {
+                                            "_": "%d Zeilen ausgewählt",
+                                            "0": "",
+                                            "1": "1 Zeile ausgewählt"
+                                        }
+                                    },
+                                    "buttons": {
+                                        "print": "Drucken",
+                                        "colvis": "Spalten",
+                                        "copy": "Kopieren",
+                                        "copyTitle": "In Zwischenablage kopieren",
+                                        "copyKeys": "Taste <i>ctrl</i> oder <i>\u2318</i> + <i>C</i> um Tabelle<br>in Zwischenspeicher zu kopieren.<br><br>Um abzubrechen die Nachricht anklicken oder Escape drücken.",
+                                        "copySuccess": {
+                                            "_": "%d Spalten kopiert",
+                                            "1": "1 Spalte kopiert"
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+{{end}}

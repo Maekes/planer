@@ -2,9 +2,11 @@ package mongo
 
 import (
 	"errors"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/Maekes/planer/mongo/role"
 	uuid "github.com/satori/go.uuid"
 
 	mgo "gopkg.in/mgo.v2"
@@ -26,6 +28,19 @@ func NewUserService(session *Session, dbName string, collectionName string) *Use
 	return &UserService{collection}
 }
 
+func (p *UserService) ExistsAdmin() bool {
+	i, err := p.collection.Find(bson.M{"role": role.Admin}).Count()
+	if err != nil {
+		//TODO
+	}
+	if i == 0 {
+		return false
+	} else {
+		return true
+	}
+
+}
+
 func (p *UserService) GetUsernameByID(u uuid.UUID) string {
 	model := userModel{}
 	err := p.collection.Find(bson.M{"uuid": u}).One(&model)
@@ -36,7 +51,7 @@ func (p *UserService) GetUsernameByID(u uuid.UUID) string {
 
 }
 
-func (p *UserService) CreateNewUser(name, mail, password string) error {
+func (p *UserService) CreateNewUser(name, mail, password string, role role.Role) error {
 	i, _ := p.collection.Find(bson.M{"username": name}).Count()
 	if i > 0 {
 		return errors.New("Der Nutzername ist bereits vergeben")
@@ -58,6 +73,9 @@ func (p *UserService) CreateNewUser(name, mail, password string) error {
 		Username: name,
 		Mail:     mail,
 		Password: hp,
+		Role:     role,
+		Created:  time.Now(),
+		Active:   true,
 	}
 
 	return p.collection.Insert(&u)
@@ -74,10 +92,31 @@ func (p *UserService) GetAllUser() (*[]userModel, error) {
 	err := p.collection.Find(nil).All(&results)
 	return &results, err
 }
-
 func (p *UserService) DeleteUserById(Id string) error {
 	uid, err := uuid.FromString(Id)
 	err = p.collection.Remove(bson.M{"uuid": uid})
+	return err
+}
+
+func (p *UserService) AdminDeleteUserById(Id string) error {
+	uid, err := uuid.FromString(Id)
+	err = p.collection.Remove(bson.M{"uuid": uid})
+	return err
+}
+
+func (p *UserService) AdminChangeUserPasswordById(Id, password string) error {
+	uid, err := uuid.FromString(Id)
+	hp, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return errors.New("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.")
+	}
+	err = p.collection.Update(bson.M{"uuid": uid}, bson.M{"$set": bson.M{"password": hp}})
+	return err
+}
+
+func (p *UserService) ChangeUserPasswordById(Id, password string) error {
+	uid, err := uuid.FromString(Id)
+	err = p.collection.Update(bson.M{"uuid": uid}, bson.M{"$set": bson.M{"password": password}})
 	return err
 }
 

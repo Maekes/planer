@@ -1,8 +1,11 @@
 package mongo
 
 import (
+	"time"
+
 	uuid "github.com/satori/go.uuid"
 
+	"github.com/Maekes/planer/mongo/role"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -13,6 +16,9 @@ type userModel struct {
 	Username string
 	Password []byte
 	Mail     string
+	Role     role.Role
+	Created  time.Time
+	Active   bool
 }
 
 func userModelIndex() mgo.Index {

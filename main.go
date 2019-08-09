@@ -175,6 +175,14 @@ func main() {
 		auth.POST("/minis", handler.AddMiniHandler)
 		auth.POST("/minis/importFromExcel", handler.AddMiniFromExcelHandler)
 
+		admin := auth.Group("adminArea")
+		admin.Use(handler.AdminMiddleware)
+		{
+			admin.GET("/", handler.AdminHandler)
+			admin.GET("/user/delete/:id", handler.UserDeleteHandler)
+			admin.GET("/user/resetPassword/:id", handler.UserResetPassword)
+		}
+
 	}
 
 	r.NoRoute(handler.Error404Handler)

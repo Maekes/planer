@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Maekes/planer/mongo/role"
 	jwtsession "github.com/ScottHuangZL/gin-jwt-session"
 	"github.com/gin-gonic/gin"
 )
@@ -86,6 +87,25 @@ func ValidationMiddleware(c *gin.Context) {
 	} else {
 		c.Abort()
 		c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
+
+}
+
+func AdminMiddleware(c *gin.Context) {
+	//flashes := jwtsession.GetFlashes(c)
+	username, err := jwtsession.ValidateJWTToken(c)
+
+	if err == nil && username != "" {
+		u, err := userService.GetByUsername(username)
+		if u.Role != role.Admin || err != nil {
+			c.Abort()
+			c.Redirect(http.StatusTemporaryRedirect, "/messdienerplan")
+		} else {
+			c.Next()
+		}
+	} else {
+		c.Abort()
+		c.Redirect(http.StatusTemporaryRedirect, "/messdienerplan")
 	}
 
 }

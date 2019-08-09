@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Maekes/planer/mongo"
+	"github.com/Maekes/planer/mongo/role"
 	"gopkg.in/gomail.v2"
 
 	"github.com/gin-gonic/gin"
@@ -43,6 +44,14 @@ func InitHandler(url string) {
 	messeService = mongo.NewMesseService(session.Copy(), dbName, "messen")
 	miniService = mongo.NewMiniService(session.Copy(), dbName, "minis")
 	planService = mongo.NewPlanService(session.Copy(), dbName, "plan")
+
+	if !userService.ExistsAdmin() {
+		err := userService.CreateNewUser("admin", "admin@planer.minis-quirin.de", "admin", role.Admin)
+		if err != nil {
+			//TODO
+		}
+		log.Println("#### Created new admin u:admin/p:admin ####")
+	}
 }
 
 func LoginHandler(c *gin.Context) {
@@ -188,7 +197,7 @@ func RegisterPostHandler(c *gin.Context) {
 		return
 	}
 
-	if err := userService.CreateNewUser(form.Name, form.Mail, form.Password); err != nil {
+	if err := userService.CreateNewUser(form.Name, form.Mail, form.Password, role.User); err != nil {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"Title": "Register",
 			"error": err.Error(),
@@ -482,6 +491,13 @@ func MinisHandler(c *gin.Context) {
 	})
 }
 
+func AdminHandler(c *gin.Context) {
+	user, _ := userService.GetAllUser()
+	c.HTML(http.StatusOK, "adminArea", gin.H{
+		"title": "Administration",
+		"user":  user,
+	})
+}
 func MessenHandler(c *gin.Context) {
 	data, _ := messeService.GetAllMessen() //GetAllMessenFromDate(time.Now().AddDate(0, 0, -7))
 	c.HTML(http.StatusOK, "messen", gin.H{
@@ -551,6 +567,19 @@ func MinisDeleteHandler(c *gin.Context) {
 	idToSreach := c.Param("id")
 	miniService.DeleteMiniById(idToSreach)
 	c.Redirect(http.StatusFound, "/minis")
+}
+
+func UserDeleteHandler(c *gin.Context) {
+	idToSreach := c.Param("id")
+	userService.DeleteUserById(idToSreach)
+	c.Redirect(http.StatusFound, "/adminArea")
+}
+
+func UserResetPassword(c *gin.Context) {
+	idToSreach := c.Param("id")
+	password := "123456"
+	userService.AdminChangeUserPasswordById(idToSreach, password)
+	c.Redirect(http.StatusFound, "/adminArea")
 }
 
 func AddMessenHandler(c *gin.Context) {
