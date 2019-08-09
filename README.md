@@ -36,7 +36,7 @@ curl --get https://raw.githubusercontent.com/Maekes/planer/master/docker-compose
 ## Start the service
 After getting all file we can start our application with
 ```
-docker-compose up
+docker-compose up -d
 ```
 
 ## Updating the service
