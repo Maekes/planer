@@ -5,7 +5,6 @@ services:
     build: .
     ports:
       - "400:80"
-      - "401:443"
     depends_on:
       - "mongo"
     restart: always
@@ -15,4 +14,6 @@ services:
     ports:
       - "27017:27017"
     restart: always
+    volumes:
+      - "/opt/mongodb:/data/db"
   
