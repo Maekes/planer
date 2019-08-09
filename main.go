@@ -183,7 +183,7 @@ func main() {
 		r.Run("127.0.0.1:8080")
 		//r.RunTLS("localhost:8080", "localhost.crt", "localhost.key")
 		//log.Fatal(autotls.Run(r, "localhost"))
-	} else if flag == "-notls" {
+	} else if flag == "-n" {
 		r.Run("0.0.0.0:80")
 	} else {
 		log.Fatal(autotls.Run(r, "planer.minis-quirin.de", "www.planer.minis-quirin.de"))
