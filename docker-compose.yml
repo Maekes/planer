@@ -3,9 +3,11 @@ services:
   planer:
     container_name: planer
     build: .
-    ports:
-      - "80:80"
-      - "443:443"
+    expose:
+      - "443"
+    labels:
+      - "traefik.frontend.rule=Host:planer.localhost"
+      - "traefik.frontend.rule=Host:planer.minis-quirin.de"
     depends_on:
       - "mongo"
     restart: always
@@ -15,3 +17,7 @@ services:
     ports:
       - "27017:27017"
     restart: always
+  
+networks:
+  web:
+    external: true
