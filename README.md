@@ -38,3 +38,11 @@ After getting all file we can start our application with
 ```
 docker-compose up
 ```
+
+## Updating the service
+If you want to update planer after changes have made simply stop the service, rebuild it and start it again:
+```
+docker stop planer
+docker build planer
+docker start planer
+```
