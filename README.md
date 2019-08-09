@@ -16,8 +16,9 @@ To connect first time to the pi use ssh
 
 The default PW for the user `pirate` is `hypriot`
 
-## Setup Portainer
+## Setup Portainer (optional)
 An easy way to manage all Docker container is  portainer.io
+
 *Portainer is a lightweight management UI which allows you to easily manage your Docker host or Swarm cluster.*
 
 ## Get Files
