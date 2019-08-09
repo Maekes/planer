@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
 
 	"github.com/Maekes/planer/handler"
@@ -180,9 +179,9 @@ func main() {
 	r.NoRoute(handler.Error404Handler)
 
 	if flag == "-l" {
-		//r.Run("127.0.0.1:8080")
+		r.Run("127.0.0.1:8080")
 		//r.RunTLS("localhost:8080", "localhost.crt", "localhost.key")
-		log.Fatal(autotls.Run(r, "localhost"))
+		//log.Fatal(autotls.Run(r, "localhost"))
 	} else {
 		//r.Run("0.0.0.0:80")
 		autotls.Run(r, "planer.minis-quirin.de", "www.planer.minis-quirin.de")
