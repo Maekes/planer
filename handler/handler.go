@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -110,8 +112,6 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	planService.NewRueckmeldungPublic(name, messen, hinweis, planid)
 	plan, err := planService.GetPlanByUUIDPublic(planid)
 
-	mailText := "<h2> Neue Rückmeldung von " + name + "</h2> <p>"
-
 	for _, m := range messen {
 		uid, err := uuid.FromString(m)
 		if err != nil {
@@ -122,32 +122,52 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 
 	me, err := messeService.GetAllMessenWithUUIDsPublic(messen)
 
-	for _, m := range *me {
-		tag := toGermanShort(m.Datum.Format("Mon"))
-		mailText = mailText + "" + tag + " " + m.Datum.Format("2.1. - 15:04") + " - " + m.Gottesdienst + "   " + m.InfoForPlan + "</br>"
+	type rueckmeldung struct {
+		Plantitel string
+		Name      string
+		Messen    *[]mongo.MesseModel
+		Hinweis   string
 	}
 
-	mailText = mailText + "</p></br>" + "<b>Hinweis: " + hinweis + "</b>"
+	r := rueckmeldung{plan.Titel, name, me, hinweis}
+
+	t := template.New("views/rueckmeldung-mail-template.html")
+	t.Funcs(C.Funcs)
+	t, err = t.ParseFiles("views/ueckmeldung-mail-template.html")
+	if err != nil {
+		log.Println(err)
+		error = true
+		message = err.Error()
+	}
+
+	var tpl bytes.Buffer
+	if err := t.Execute(&tpl, r); err != nil {
+		log.Println(err)
+		error = true
+		message = err.Error()
+	}
+
+	result := tpl.String()
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", "leiterrunde@minis-quirin.de")
 	m.SetHeader("To", "leiterrunde@minis-quirin.de")
 	m.SetHeader("Subject", name+" | Rückmeldung Plan "+plan.Titel)
-	m.SetBody("text/html", mailText)
+	m.SetBody("text/html", result)
 
-	d := gomail.NewDialer("minis-quirin.de", 465, "leiterrunde@minis-quirin.de", "9.Kugeln")
+	d := gomail.NewDialer("minis-quirin.de", 465, "leiterrunde@minis-quirin.de", "")
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	// Send the email
-	/*
-		if err := d.DialAndSend(m); err != nil {
-			error = true
-			message = "Die Nachricht konnte nicht versendet werden. Versuchen Sie es später noch einmal."
-		} else {
-			error = false
-			message = "Vielen Dank. Die Rückmeldung wurde verschickt."
-		}
-	*/
+
+	if err := d.DialAndSend(m); err != nil {
+		error = true
+		message = "Die Nachricht konnte nicht versendet werden. Versuchen Sie es später noch einmal."
+	} else {
+		error = false
+		message = "Vielen Dank. Die Rückmeldung wurde verschickt."
+	}
+
 	time.Sleep(2 * time.Second)
 	c.JSON(200, gin.H{
 		"error":   error,
@@ -258,6 +278,7 @@ func ZuordnenHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "zuordnen", gin.H{
 		"title":          "Messen",
 		"username":       userService.GetUsernameByID(miniService.AktUser),
+		"role":           userService.GetRoleByID(miniService.AktUser),
 		"UUID":           p.UUID,
 		"messenPayload":  messen,
 		"minisPayload":   minis,
@@ -276,6 +297,7 @@ func MessdienerplanHandler(c *gin.Context) {
 		"title":       "Messdienerplan",
 		"planPayload": plan,
 		"username":    userService.GetUsernameByID(miniService.AktUser),
+		"role":        userService.GetRoleByID(miniService.AktUser),
 	})
 }
 func MessdienerplanCreateHandler(c *gin.Context) {
@@ -487,6 +509,7 @@ func MinisHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "messdienerliste", gin.H{
 		"title":    "Messdienerliste",
 		"username": userService.GetUsernameByID(miniService.AktUser),
+		"role":     userService.GetRoleByID(miniService.AktUser),
 		"payload":  data,
 	})
 }
@@ -494,16 +517,30 @@ func MinisHandler(c *gin.Context) {
 func AdminHandler(c *gin.Context) {
 	user, _ := userService.GetAllUser()
 	c.HTML(http.StatusOK, "adminArea", gin.H{
-		"title": "Administration",
-		"user":  user,
+		"title":    "Administration",
+		"user":     user,
+		"username": userService.GetUsernameByID(miniService.AktUser),
+		"role":     userService.GetRoleByID(miniService.AktUser),
 	})
 }
+
+func EinstellungenHandler(c *gin.Context) {
+
+	c.HTML(http.StatusOK, "einstellungen", gin.H{
+		"title":    "Einstellungen",
+		"user":     userService.GetAktUser(),
+		"username": userService.GetUsernameByID(miniService.AktUser),
+		"role":     userService.GetRoleByID(miniService.AktUser),
+	})
+}
+
 func MessenHandler(c *gin.Context) {
 	data, _ := messeService.GetAllMessen() //GetAllMessenFromDate(time.Now().AddDate(0, 0, -7))
 	c.HTML(http.StatusOK, "messen", gin.H{
 		"title":    "Messen",
 		"payload":  data,
 		"username": userService.GetUsernameByID(miniService.AktUser),
+		"role":     userService.GetRoleByID(miniService.AktUser),
 		"from":     time.Now().Format("2006-01-02"),
 		"to":       time.Now().Format("2006-01-02"),
 	})
@@ -533,6 +570,7 @@ func MessenfromtoDateHandler(c *gin.Context) {
 		"title":    "Messen",
 		"payload":  data,
 		"username": userService.GetUsernameByID(miniService.AktUser),
+		"role":     userService.GetRoleByID(miniService.AktUser),
 		"from":     c.PostForm("from"),
 		"to":       c.PostForm("to"),
 	})

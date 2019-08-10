@@ -1,9 +1,9 @@
 <div class="header collapse d-lg-flex p-0" id="headerMenuCollapse">
   <div class="container">
     <div class="row align-items-center">
-      
+
       <div class="col-lg-3 ml-auto">
-     <!-- 
+        <!-- 
           <form class="input-icon my-3 my-lg-0">
           <input type="search" class="form-control header-search" placeholder="Search&hellip;" tabindex="1">
           <div class="input-icon-addon">
@@ -29,18 +29,23 @@
             </li>
       -->
           <li class="nav-item">
-              <a href="/messen" class="nav-link"><i class="fe fe-calendar"></i>Messen</a>
+            <a href="/messen" class="nav-link"><i class="fe fe-calendar"></i>Messen</a>
           </li>
           <li class="nav-item">
             <a href="/minis" class="nav-link"><i class="fe fe-users"></i> Messdiener</a>
           </li>
 
           <li class="nav-item">
-            <a href="/messdienerplan" class="nav-link"><i class="fe fe-edit"></i> Messdienerplan</a>
+            <a href="/messdienerplan" class="nav-link {{if eq .title "Messdienerplan" }} active {{end}}"><i class="fe fe-edit"></i> Messdienerplan</a>
           </li>
+          <li class="nav-item">
+            <a href="/einstellungen" class="nav-link {{if eq .title "Einstellungen" }} active {{end}}"><i class="fe fe-settings"></i> Einstellungen</a>
+          </li>
+          {{if eq .role "Administrator"}}
           <li class="nav-item">
             <a href="/adminArea" class="nav-link"><i class="fe fe-settings"></i> Administration</a>
           </li>
+          {{end}}
 
         </ul>
       </div>

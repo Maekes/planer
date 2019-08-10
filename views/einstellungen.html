@@ -1,0 +1,83 @@
+{{define "content"}}
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">
+            Einstellungen
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="media">
+                        <span class="avatar avatar-xxl mr-5"
+                            style="background-image: url(demo/faces/male/18.jpg)"></span>
+                        <div class="media-body">
+                            <h4 class="m-0">{{.user.Username}}</h4>
+                            <p class="text-muted mb-2">{{.user.Role}}</p>
+                            <p class="text-muted mb-0"><i class="fe fe-mail pt-1"></i> {{.user.Mail}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Passwort ändern</h3>
+                </div>
+                <div class="card-alert alert alert-success mb-0">
+                    Das Passwort wurde erfolgreich geändert.
+                </div>
+                <div class="card-alert alert alert-danger mb-0" hidden>
+                    Es ist ein fehler aufgetreten. Bitte versuchen Sie es später noch einmal.
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="form-label">Aktuelles Passwort</label>
+                            <input type="password" class="form-control" value="" name="password_old"
+                                placeholder="Passwort" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Neues Passwort</label>
+                            <input type="password" id="pass" name="password" class="form-control" placeholder="Passwort"
+                                oninput="checkPassword()">
+                            <div class="progress mt-2" style="height: 5px;">
+                                <div class="progress-bar w-1 bg-danger" id="bar" role="progressbar" aria-valuenow="1"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="password" name="passwordRepeat" class="form-control"
+                                placeholder="Passwort wiederholen">
+                            <div class="form-footer">
+                                <button class="btn btn-danger btn-block">Speichern</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-8">
+
+            <form class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Edit Profile</h3>
+                    <div class="row">
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+</div>
+
+
+{{end}}

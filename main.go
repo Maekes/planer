@@ -175,6 +175,8 @@ func main() {
 		auth.POST("/minis", handler.AddMiniHandler)
 		auth.POST("/minis/importFromExcel", handler.AddMiniFromExcelHandler)
 
+		auth.GET("/einstellungen", handler.EinstellungenHandler)
+
 		admin := auth.Group("adminArea")
 		admin.Use(handler.AdminMiddleware)
 		{

@@ -21,6 +21,9 @@ type userModel struct {
 	Active   bool
 }
 
+type userSettings struct {
+}
+
 func userModelIndex() mgo.Index {
 	return mgo.Index{
 		Key:        []string{"uuid"},

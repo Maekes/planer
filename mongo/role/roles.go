@@ -1,9 +1,9 @@
 package role
 
 const (
-	Admin = "admin"
-	User  = "user"
-	Guest = "guest"
+	Admin = "Administrator"
+	User  = "User"
+	Guest = "Gast"
 )
 
 type Role string

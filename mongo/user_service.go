@@ -15,6 +15,7 @@ import (
 
 type UserService struct {
 	collection *mgo.Collection
+	aktUser    uuid.UUID
 }
 
 const (
@@ -22,10 +23,14 @@ const (
 	dbName   = "test_db"
 )
 
+func (p *UserService) ForUser(u uuid.UUID) {
+	p.aktUser = u
+}
+
 func NewUserService(session *Session, dbName string, collectionName string) *UserService {
 	collection := session.GetCollection(dbName, collectionName)
 	collection.EnsureIndex(userModelIndex())
-	return &UserService{collection}
+	return &UserService{collection, uuid.Nil}
 }
 
 func (p *UserService) ExistsAdmin() bool {
@@ -48,6 +53,24 @@ func (p *UserService) GetUsernameByID(u uuid.UUID) string {
 		//TODO
 	}
 	return model.Username
+}
+
+func (p *UserService) GetAktUser() *userModel {
+	model := userModel{}
+	err := p.collection.Find(bson.M{"uuid": p.aktUser}).One(&model)
+	if err != nil {
+		//TODO
+	}
+	return &model
+}
+
+func (p *UserService) GetRoleByID(u uuid.UUID) role.Role {
+	model := userModel{}
+	err := p.collection.Find(bson.M{"uuid": u}).One(&model)
+	if err != nil {
+		//TODO
+	}
+	return model.Role
 
 }
 

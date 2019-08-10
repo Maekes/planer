@@ -79,6 +79,7 @@ func ValidationMiddleware(c *gin.Context) {
 			planService.ForUser(u.UUID)
 			messeService.ForUser(u.UUID)
 			miniService.ForUser(u.UUID)
+			userService.ForUser(u.UUID)
 			c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 			c.Header("Pragma", "no-cache") // HTTP 1.0.
 			c.Header("Expires", "0")
@@ -99,13 +100,13 @@ func AdminMiddleware(c *gin.Context) {
 		u, err := userService.GetByUsername(username)
 		if u.Role != role.Admin || err != nil {
 			c.Abort()
-			c.Redirect(http.StatusTemporaryRedirect, "/messdienerplan")
+			c.Redirect(http.StatusTemporaryRedirect, "/")
 		} else {
 			c.Next()
 		}
 	} else {
 		c.Abort()
-		c.Redirect(http.StatusTemporaryRedirect, "/messdienerplan")
+		c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
 
 }
