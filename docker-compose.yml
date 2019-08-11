@@ -13,7 +13,7 @@ services:
     image: nonoroazoro/rpi-mongo
     restart: always
     ports:
-        - "401:27014"
+        - "401:27017"
     volumes:
       - "/opt/mongodb:/data/db"
 #  mongoex:
