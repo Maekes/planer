@@ -11,21 +11,21 @@ services:
   mongo:
     container_name: mongo
     image: nonoroazoro/rpi-mongo
-    ports:
-  #    - "27017:27017"
     restart: always
+    ports:
+        - "401:27014"
     volumes:
       - "/opt/mongodb:/data/db"
-  mongoex:
-    container_name: mongo-express
-    image: ind3x/rpi-mongo-express
-    environment:
-        - ME_CONFIG_OPTIONS_EDITORTHEME=tomorrow-night-bright
-        - ME_CONFIG_MONGODB_SERVER=mongo
-        - ME_CONFIG_MONGODB_PORT=27017
-        - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-    ports:
-        - "401:8081"
-    links:
-        - mongo
+#  mongoex:
+#    container_name: mongo-express
+#    image: ind3x/rpi-mongo-express
+#    environment:
+#        - ME_CONFIG_OPTIONS_EDITORTHEME=tomorrow-night-bright
+#        - ME_CONFIG_MONGODB_SERVER=mongo
+#        - ME_CONFIG_MONGODB_PORT=27017
+#        - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+#    ports:
+#        - "402:8081"
+#    links:
+#        - mongo
 
