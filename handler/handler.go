@@ -34,6 +34,8 @@ var planService *mongo.PlanService
 
 var session *mongo.Session
 
+var MailPW string
+
 func InitHandler(url string) {
 	session, err := mongo.NewSession(url)
 	if err != nil {
@@ -155,7 +157,7 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	m.SetHeader("Subject", name+" | Rückmeldung Plan "+plan.Titel)
 	m.SetBody("text/html", result)
 
-	d := gomail.NewDialer("minis-quirin.de", 465, "leiterrunde@minis-quirin.de", "")
+	d := gomail.NewDialer("minis-quirin.de", 465, "leiterrunde@minis-quirin.de", MailPW)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	// Send the email

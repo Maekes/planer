@@ -14,113 +14,19 @@ import (
 
 func main() {
 
-	/*
-		userService.CreateNewUser("Nutzer", "max@mustermann.de", "123456")
-
-		usr, _ := userService.GetByUsername("Nutzer")
-		messeService.ForUser(usr.UUID)
-		planService.ForUser(usr.UUID)
-		miniService.ForUser(usr.UUID)
-
-		uidp, _ := uuid.NewV4()
-		t, _ := time.Parse("02.01.2006", "30.06.2019")
-
-		plan := mongo.PlanModel{
-			UUID:     uidp,
-			Erstellt: time.Now(),
-			Von:      time.Now(),
-			Bis:      t,
-			Titel:    "April / Juni (Dummy)",
-		}
-
-		//Act
-
-		l, err := time.LoadLocation("Europe/Berlin")
-		if xlFile, err := xls.Open("plan2.xls", "utf-8"); err == nil {
-			for i := 0; i < xlFile.NumSheets(); i++ {
-				sheet := xlFile.GetSheet(i)
-				for j := 1; j <= int(sheet.MaxRow); j++ { //int(sheet.MaxRow)
-					row := sheet.Row(j)
-					if row.Col(0) == "" {
-						break
-					}
-					d, err := time.ParseInLocation("2006-01-02T15:04:05Z", row.Col(1), l)
-					u, err := time.ParseInLocation("15:04", row.Col(2), l)
-					t, err := strconv.ParseFloat(row.Col(2), 32)
-					u = timeFromExcelTime(t, true)
-					s, err := time.ParseDuration("1s")
-					u = u.Add(s) //Sekunde die Floating Point Fehler ausgleicht
-					d = d.Add(time.Hour*time.Duration(u.Hour()) +
-						time.Minute*time.Duration(u.Minute()) +
-						0)
-
-					if err != nil {
-						log.Println("Could not Parse Time")
-					}
-
-					//ti := format.TimeFromExcelTime(t, true)
-
-					uid, _ := uuid.NewV4()
-
-					m := mongo.MesseModel{
-						UUID:            uid,
-						Datum:           d,
-						Gottesdienst:    row.Col(3),
-						LiturgischerTag: row.Col(5),
-						Bemerkung:       row.Col(6),
-						IsRelevant:      checkIfRelevant(row.Col(3), row.Col(6), d.Format("Mon"), d.Format("15:04")),
-						//MinisForPlan:    []uuid.UUID{},
-						Rueckmeldungen: []mongo.MiniModel{},
-					}
-					/*
-						for i := 0; i < 10; i++ {
-							m.MinisForPlan = append(m.MinisForPlan, uidm)
-						}*/
-	/*
-					messeService.Create(&m)
-
-				}
-
-			}
-		}
-
-		planService.Create(&plan)
-	*/
-	//Add Minis
-	/*
-		if xlsFile, err := xls.Open("minis.xls", "utf-8"); err == nil {
-			sheet := xlsFile.GetSheet(0)
-			for j := 1; j < int(sheet.MaxRow); j++ {
-				row := sheet.Row(j)
-				if row.Col(1) == "" {
-					break
-				}
-				uid, _ := uuid.NewV4()
-				log.Println(row.Col(2))
-
-				groups := []string{"gray", "azure", "indigo", "purple", "pink", "red", "orange", "yellow", "lime"}
-
-				m := mongo.MiniModel{
-					UUID:     uid,
-					Vorname:  row.Col(1),
-					Nachname: row.Col(2),
-					Gruppe:   groups[rand.Intn(9)],
-				}
-				miniService.Create(&m)
-			}
-		}
-	*/
-	flag := ""
+	f := ""
 	if len(os.Args) > 1 {
-		flag = os.Args[1]
+		f = os.Args[1]
 	}
 
-	if flag == "-l" {
+	if f == "-l" {
 		handler.InitHandler(":27017")
 	} else {
 		handler.InitHandler("mongo:27017")
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	handler.MailPW = *flag.String("pw", "", "Password for MailServer")
 
 	r := gin.Default()
 
@@ -189,11 +95,11 @@ func main() {
 
 	r.NoRoute(handler.Error404Handler)
 
-	if flag == "-l" {
+	if f == "-l" {
 		r.Run("127.0.0.1:8080")
 		//r.RunTLS("localhost:8080", "localhost.crt", "localhost.key")
 		//log.Fatal(autotls.Run(r, "localhost"))
-	} else if flag == "-n" {
+	} else if f == "-n" {
 		r.Run("0.0.0.0:80")
 	} else {
 		log.Fatal(autotls.Run(r, "planer.minis-quirin.de", "www.planer.minis-quirin.de"))
