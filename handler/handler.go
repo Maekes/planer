@@ -133,9 +133,7 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 
 	r := rueckmeldung{plan.Titel, name, me, hinweis}
 
-	t := template.New("views/rueckmeldung-mail-template.html")
-	t.Funcs(C.Funcs)
-	t, err = t.ParseFiles("views/ueckmeldung-mail-template.html")
+	t, err := template.New("rueckmeldung-mail-template.html").Funcs(C.Funcs).ParseFiles("views/rueckmeldung-mail-template.html")
 	if err != nil {
 		log.Println(err)
 		error = true
@@ -152,12 +150,12 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	result := tpl.String()
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", "leiterrunde@minis-quirin.de")
+	m.SetHeader("From", "planer@minis-quirin.de")
 	m.SetHeader("To", "leiterrunde@minis-quirin.de")
 	m.SetHeader("Subject", name+" | Rückmeldung Plan "+plan.Titel)
 	m.SetBody("text/html", result)
 
-	d := gomail.NewDialer("minis-quirin.de", 465, "leiterrunde@minis-quirin.de", MailPW)
+	d := gomail.NewDialer("minis-quirin.de", 465, "planer@minis-quirin.de", MailPW)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	// Send the email

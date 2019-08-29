@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
 
 	"github.com/Maekes/planer/handler"
 
@@ -14,19 +13,18 @@ import (
 
 func main() {
 
-	f := ""
-	if len(os.Args) > 1 {
-		f = os.Args[1]
-	}
+	flag.StringVar(&handler.MailPW, "pw", "", "Password for MailServer")
+	local := flag.Bool("local", false, "Run Server on Local Machine")
+	noTLS := flag.Bool("notls", false, "Disable TLS for Webserver")
 
-	if f == "-l" {
+	flag.Parse()
+
+	if *local {
 		handler.InitHandler(":27017")
 	} else {
 		handler.InitHandler("mongo:27017")
 		gin.SetMode(gin.ReleaseMode)
 	}
-
-	handler.MailPW = *flag.String("pw", "", "Password for MailServer")
 
 	r := gin.Default()
 
@@ -95,11 +93,11 @@ func main() {
 
 	r.NoRoute(handler.Error404Handler)
 
-	if f == "-l" {
+	if *local {
 		r.Run("127.0.0.1:8080")
 		//r.RunTLS("localhost:8080", "localhost.crt", "localhost.key")
 		//log.Fatal(autotls.Run(r, "localhost"))
-	} else if f == "-n" {
+	} else if *noTLS {
 		r.Run("0.0.0.0:80")
 	} else {
 		log.Fatal(autotls.Run(r, "planer.minis-quirin.de", "www.planer.minis-quirin.de"))
