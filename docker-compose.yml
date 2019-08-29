@@ -8,24 +8,24 @@ services:
     depends_on:
       - "mongo"
     restart: always
+    volumes: 
+      - "/etc/localtime:/etc/localtime:ro" 
   mongo:
     container_name: mongo
     image: nonoroazoro/rpi-mongo
     restart: always
-    ports:
-        - "401:27017"
     volumes:
       - "/opt/mongodb:/data/db"
-#  mongoex:
-#    container_name: mongo-express
-#    image: ind3x/rpi-mongo-express
-#    environment:
-#        - ME_CONFIG_OPTIONS_EDITORTHEME=tomorrow-night-bright
-#        - ME_CONFIG_MONGODB_SERVER=mongo
-#        - ME_CONFIG_MONGODB_PORT=27017
-#        - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-#    ports:
-#        - "402:8081"
-#    links:
-#        - mongo
+  mongoex:
+    container_name: mongo-express
+    image: ind3x/rpi-mongo-express
+    environment:
+        - ME_CONFIG_OPTIONS_EDITORTHEME=tomorrow-night-bright
+        - ME_CONFIG_MONGODB_SERVER=mongo
+        - ME_CONFIG_MONGODB_PORT=27017
+        - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+    ports:
+        - "402:8081"
+    links:
+        - mongo
 
