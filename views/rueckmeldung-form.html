@@ -169,7 +169,8 @@ $.ajax({
        dataType: 'json',
        success: function( resp ) {
             if (resp.error) {
-                setTimeout(window.scrollTo(0,0),100);
+                window.scrollTo(0,0)
+                window.scroll(0,0)
                 $('#alertNoError').attr('hidden', true);
                 $('#alertError').removeAttr('hidden');
                 $('#alertError').append(resp.message)
@@ -177,7 +178,8 @@ $.ajax({
             }else {
                 $('#alertError').attr('hidden', true);
                 $('#form').trigger("reset");
-                setTimeout(window.scrollTo(0,0),100);
+                window.scrollTo(0,0)
+                window.scroll(0,0)
                 $('#alertNoError').removeAttr('hidden');
                 $('#alertNoError').append(resp.message)
                 $('#submitButton').removeClass("disabled")
@@ -185,7 +187,8 @@ $.ajax({
         },
         error: function() {
                 $('#alertNoError').attr('hidden', true);
-                setTimeout(window.scrollTo(0,0),100);
+                window.scrollTo(0,0)
+                window.scroll(0,0)
                 $('#alertError').removeAttr('hidden');
                 $('#alertError').append("Es ist ein Fehler aufgetreten, die Rückmeldung konnte nicht versendet werden. Versuchen Sie es später noch einmal.")
                 $('#submitButton').removeClass("disabled")
