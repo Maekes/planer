@@ -76,7 +76,7 @@ func RueckmeldungFormHandler(c *gin.Context) {
 		return
 	}
 	p, err := planService.GetPlanByUUIDPublic(uuid)
-	messen, err := messeService.GetAllMessenThatAreRelevantFromToDatePublic(p.Von, p.Bis)
+	messen, err := messeService.GetAllMessenThatAreRelevantFromToDatePublic(p.Von, p.Bis, p.UserUUID)
 
 	if err != nil {
 		//	log.Println(err.Error())
@@ -87,6 +87,7 @@ func RueckmeldungFormHandler(c *gin.Context) {
 		"messenPayload": messen,
 		"planTitle":     p.Titel,
 		"planID":        p.UUID,
+		"hinweis":       p.RueckmeldungHinweis,
 		"from":          p.Von.Format("02.01.2006"),
 		"to":            p.Bis.Format("02.01.2006"),
 	})
@@ -313,11 +314,12 @@ func MessdienerplanCreateHandler(c *gin.Context) {
 	uid := uuid.NewV4()
 
 	planService.Create(&mongo.PlanModel{
-		UUID:     uid,
-		Erstellt: time.Now(),
-		Von:      fromDate,
-		Bis:      toDate,
-		Titel:    c.PostForm("title"),
+		UUID:                uid,
+		Erstellt:            time.Now(),
+		Von:                 fromDate,
+		Bis:                 toDate,
+		Titel:               c.PostForm("title"),
+		RueckmeldungHinweis: c.PostForm("hinweis"),
 	})
 
 	if err != nil {

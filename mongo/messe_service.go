@@ -132,7 +132,7 @@ func (p *MesseService) GetAllMessenThatAreRelevantFromToDate(fromDate, toDate ti
 
 }
 
-func (p *MesseService) GetAllMessenThatAreRelevantFromToDatePublic(fromDate, toDate time.Time) (*[]MesseModel, error) {
+func (p *MesseService) GetAllMessenThatAreRelevantFromToDatePublic(fromDate, toDate time.Time, user uuid.UUID) (*[]MesseModel, error) {
 	var results []MesseModel
 	err := p.collection.Find(
 		bson.M{
@@ -140,6 +140,7 @@ func (p *MesseService) GetAllMessenThatAreRelevantFromToDatePublic(fromDate, toD
 				"$gt": fromDate,
 				"$lt": toDate,
 			},
+			"useruuid":   user,
 			"isrelevant": true,
 		}).Sort("datum").All(&results)
 	return &results, err

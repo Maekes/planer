@@ -30,6 +30,12 @@
               <input type="text" name="to"  id="datepicker" class="form-control datepicker-here" placeholder="28.02.2019" data-language="de" data-position="right top" />
             </div>
 
+            <div class="form-group">
+              <label class="form-label">Hinweis für Rückmeldung</label>
+              <input class="form-control" name="hinweis" value="Bitte bis zum  eintragen wann ihr dienen könnt." />
+            </div>
+
+
 
             <script>
               // Initialization
@@ -69,7 +75,7 @@
         </div>
         <div class="card-body">
           <p class="leading-tight mb-3"><i class="fe fe-calendar"></i> Erstellt am: {{getDate .Erstellt}} <i
-              class="fe fe-calendar ml-5"></i> ID: {{ .UUID}} </p>
+              class="fe fe-link ml-5"></i> <a href="/rueckmeldung?id={{.UUID}}">Zur Rückmeldung</a></p>
           <pre class="leading-tight">{{getMessen .Von .Bis}}</pre>
           <p class="leading-tight text-right"><a href="/messdienerplan/delete/{{ .UUID}}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Plan
               Löschen</a></p>

@@ -16,7 +16,6 @@ func main() {
 	flag.StringVar(&handler.MailPW, "pw", "", "Password for MailServer")
 	local := flag.Bool("local", false, "Run Server on Local Machine")
 	noTLS := flag.Bool("notls", false, "Disable TLS for Webserver")
-
 	flag.Parse()
 
 	if *local {

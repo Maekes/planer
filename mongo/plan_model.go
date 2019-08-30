@@ -10,14 +10,15 @@ import (
 )
 
 type PlanModel struct {
-	Id             bson.ObjectId `bson:"_id,omitempty"`
-	UUID           uuid.UUID
-	Erstellt       time.Time
-	Von            time.Time
-	Bis            time.Time
-	Titel          string
-	UserUUID       uuid.UUID
-	Rueckmeldungen []Rueckmeldung
+	Id                  bson.ObjectId `bson:"_id,omitempty"`
+	UUID                uuid.UUID
+	Erstellt            time.Time
+	Von                 time.Time
+	Bis                 time.Time
+	Titel               string
+	UserUUID            uuid.UUID
+	Rueckmeldungen      []Rueckmeldung
+	RueckmeldungHinweis string
 }
 
 type Rueckmeldung struct {
