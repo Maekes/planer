@@ -8,14 +8,17 @@ services:
     depends_on:
       - "mongo"
     restart: always
-    volumes: 
-      - "/etc/localtime:/etc/localtime:ro" 
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
   mongo:
     container_name: mongo
     image: nonoroazoro/rpi-mongo
     restart: always
     volumes:
       - "/opt/mongodb:/data/db"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
   mongoex:
     container_name: mongo-express
     image: ind3x/rpi-mongo-express
@@ -28,4 +31,7 @@ services:
         - "402:8081"
     links:
         - mongo
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
 
