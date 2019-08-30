@@ -37,6 +37,7 @@ func main() {
 
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"https://minis-quirin.de"}
+	r.Use(cors.New(config))
 
 	//new template engine
 	r.HTMLRender = handler.GetTemplateConfig()
