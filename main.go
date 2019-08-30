@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/Maekes/planer/handler"
+	"github.com/gin-contrib/cors"
 
 	jwtsession "github.com/ScottHuangZL/gin-jwt-session"
 	"github.com/gin-gonic/autotls"
@@ -33,6 +34,8 @@ func main() {
 
 	jwtsession.NewStore()
 	r.Use(jwtsession.ClearMiddleware())
+
+	r.Use(cors.Default())
 
 	//new template engine
 	r.HTMLRender = handler.GetTemplateConfig()
