@@ -7,6 +7,8 @@ WORKDIR /go/src/github.com/Maekes
 ADD https://api.github.com/repos/Maekes/planer/git/refs/heads/master version.json
 RUN git clone -b master https://github.com/Maekes/planer.git
 
+RUN apt-get install tzdata -y
+
 WORKDIR /go/src/github.com/Maekes/planer
 RUN git pull
 # COPY go.mod and go.sum files to the workspace
@@ -21,10 +23,6 @@ RUN go mod download
 # RUN go get ./...
 WORKDIR /go/src/github.com/Maekes/planer
 RUN go install
-# RUN go build -o goapp
-# Build the binary
-ENTRYPOINT ["planer", "-n"]
 
-# FROM alpine 
-# COPY --from=build-env /go/src/github.com/Maekes/planer/goapp /app/
-# CMD ["planer"]
+# Build the binary
+ENTRYPOINT planer -notls -pw=ADD_IMAP_PW_HERE
