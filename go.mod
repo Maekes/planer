@@ -9,6 +9,7 @@ require (
 	github.com/extrame/goyymmdd v0.0.0-20181026012948-914eb450555b // indirect
 	github.com/extrame/ole2 v0.0.0-20160812065207-d69429661ad7 // indirect
 	github.com/foolin/goview v0.2.0
+	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/autotls v0.0.0-20190528142357-3135c7b8d15d
 	github.com/gin-gonic/gin v1.4.0
@@ -20,7 +21,6 @@ require (
 	github.com/jinzhu/now v1.0.1
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/jung-kurt/gofpdf v1.5.4
-	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.8 // indirect
 	github.com/nkovacs/streamquote v1.0.0 // indirect
 	github.com/phpdave11/gofpdi v1.0.5 // indirect
@@ -36,7 +36,6 @@ require (
 	golang.org/x/sys v0.0.0-20190804053845-51ab0e2deafa // indirect
 	golang.org/x/tools v0.0.0-20190807201305-8be58fba6352 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
 )
