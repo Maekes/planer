@@ -104,15 +104,15 @@
     <form id="form" action="/rueckmeldung" method="POST">
         <div class="form-group row m-0 mb-4 mt-4">
             <input type="text" class="custom-control-input" name="planid" hidden value="{{.planID}}">
-            <label for="name" class="col-3 pl-0 col-form-label font-weight-bold">Name / Namen</label>
-            <div class="col-9 pr-0">
+            <label for="name" class="col-sm-3 pl-0 font-weight-bold">Name / Namen</label>
+            <div class="col-sm-9 p-0">
                 <input id="name" name="name" type="text" required="required" class="form-control"
                     placeholder="Vor- und Nachnamen">
             </div>
         </div>
         <div class="form-group row m-0">
-            <label class="col-3 pl-0 col-form-label font-weight-bold">Wunschmessen</label>
-            <div class="col-9 pr-0">
+            <label class="col-sm-3 pl-0 font-weight-bold">Wunschmessen</label>
+            <div class="col-sm-9 p-0">
 
              
                 {{range $index, $valueMessen := getMessenDividedInWeeks .messenPayload}}
@@ -135,14 +135,14 @@
             </div>
         </div>
         <div class="form-group row mr-0 ml-0">
-            <label for="hinweis" class="col-3 pl-0 col-form-label font-weight-bold">Hinweis / Wunschpartner /
+            <label for="hinweis" class="col-sm-3 pl-0 font-weight-bold">Hinweis / Wunschpartner /
                 Sonstiges</label>
-            <div class="col-9 pr-0">
+            <div class="col-sm-9 p-0">
                 <textarea id="hinweis" name="hinweis" type="text" class="form-control" rows="3"></textarea>
             </div>
         </div>
         <div class="form-group row m-0">
-            <div class="offset-3 col-9 pr-0">
+            <div class="offset-3 col-9 p-0">
                     <button type="submit" class="btn btn-loading" id="submitButton" style="color: #FFF; background-color: #670000;"><i class="fa fa-send mr-2"></i>Abschicken</button>
 
             </div>
