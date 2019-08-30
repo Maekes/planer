@@ -8,8 +8,6 @@ services:
     depends_on:
       - "mongo"
     restart: always
-    environment:
-      - "TZ=Europe/Berlin"
   mongo:
     container_name: mongo
     image: nonoroazoro/rpi-mongo
@@ -28,3 +26,5 @@ services:
         - "402:8081"
     links:
         - mongo
+environment:
+  - "TZ=Europe/Berlin"
