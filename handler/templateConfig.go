@@ -113,7 +113,6 @@ var C = goview.Config{
 				log.Println("No Messen Found to Divide")
 				//TODO
 			}
-
 			return &w
 		},
 	},
