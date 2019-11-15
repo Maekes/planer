@@ -19,6 +19,7 @@ type userModel struct {
 	Role     role.Role
 	Created  time.Time
 	Active   bool
+	PublicID uuid.UUID
 }
 
 type userSettings struct {

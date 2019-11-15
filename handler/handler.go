@@ -70,27 +70,53 @@ func RegisterHandler(c *gin.Context) {
 
 func RueckmeldungFormHandler(c *gin.Context) {
 
-	uuid, err := uuid.FromString(c.Query("id"))
-	if err != nil {
-		Error404Handler(c)
-		return
-	}
-	p, err := planService.GetPlanByUUIDPublic(uuid)
-	messen, err := messeService.GetAllMessenThatAreRelevantFromToDatePublic(p.Von, p.Bis, p.UserUUID)
+	publicId, pid := c.GetQuery("pid")
+	if pid {
+		uuid, err := uuid.FromString(publicId)
+		if err != nil {
+			Error404Handler(c)
+			return
+		}
 
-	if err != nil {
-		//	log.Println(err.Error())
+		puuid, err := userService.GetPrivateUUID(uuid)
+		if err != nil {
+			Error404Handler(c)
+			return
+		}
+
+		plan, err := planService.GetNewestPlanFromUser(puuid)
+		if err != nil {
+			Error404Handler(c)
+			return
+		}
+
+		c.Redirect(http.StatusFound, "/rueckmeldung?id="+plan.UUID.String())
 	}
 
-	c.HTML(http.StatusOK, "rueckmeldung-form.html", gin.H{
-		"title":         "Messen",
-		"messenPayload": messen,
-		"planTitle":     p.Titel,
-		"planID":        p.UUID,
-		"hinweis":       p.RueckmeldungHinweis,
-		"from":          p.Von.Format("02.01.2006"),
-		"to":            p.Bis.Format("02.01.2006"),
-	})
+	planId, plid := c.GetQuery("id")
+	if plid {
+		uuid, err := uuid.FromString(planId)
+		if err != nil {
+			Error404Handler(c)
+			return
+		}
+		p, err := planService.GetPlanByUUIDPublic(uuid)
+		messen, err := messeService.GetAllMessenThatAreRelevantFromToDatePublic(p.Von, p.Bis, p.UserUUID)
+
+		if err != nil {
+			//	log.Println(err.Error())
+		}
+
+		c.HTML(http.StatusOK, "rueckmeldung-form.html", gin.H{
+			"title":         "Messen",
+			"messenPayload": messen,
+			"planTitle":     p.Titel,
+			"planID":        p.UUID,
+			"hinweis":       p.RueckmeldungHinweis,
+			"from":          p.Von.Format("02.01.2006"),
+			"to":            p.Bis.Format("02.01.2006"),
+		})
+	}
 
 }
 
@@ -838,6 +864,18 @@ func MessenUpdateStateHandler(c *gin.Context) {
 		log.Println(err)
 	}
 
+}
+
+func Update() {
+	u, err := userService.GetAllUser()
+	if err != nil {
+		//TODO
+	}
+	for _, user := range *u {
+		if uuid.Equal(uuid.Nil, user.PublicID) {
+			userService.AddPublicID(user.UUID)
+		}
+	}
 }
 
 func Error404Handler(c *gin.Context) {

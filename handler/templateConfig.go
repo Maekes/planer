@@ -110,7 +110,7 @@ var C = goview.Config{
 				}
 				w = append(w, whelper)
 			} else {
-				log.Println("FAFALLLLLLLL ERRORRR")
+				log.Println("No Messen Found to Divide")
 				//TODO
 			}
 

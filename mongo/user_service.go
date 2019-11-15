@@ -33,6 +33,13 @@ func NewUserService(session *Session, dbName string, collectionName string) *Use
 	return &UserService{collection, uuid.Nil}
 }
 
+func (p *UserService) AddPublicID(u uuid.UUID) {
+	err := p.collection.Update(bson.M{"uuid": u}, bson.M{"$set": bson.M{"publicid": uuid.NewV4()}})
+	if err != nil {
+		//TODO
+	}
+}
+
 func (p *UserService) ExistsAdmin() bool {
 	i, err := p.collection.Find(bson.M{"role": role.Admin}).Count()
 	if err != nil {
@@ -74,6 +81,16 @@ func (p *UserService) GetRoleByID(u uuid.UUID) role.Role {
 
 }
 
+func (p *UserService) GetPrivateUUID(uidPublic uuid.UUID) (uuid.UUID, error) {
+	model := userModel{}
+	err := p.collection.Find(bson.M{"publicid": uidPublic}).One(&model)
+	if err != nil {
+		//TODO
+	}
+	return model.UUID, err
+
+}
+
 func (p *UserService) CreateNewUser(name, mail, password string, role role.Role) error {
 	i, _ := p.collection.Find(bson.M{"username": name}).Count()
 	if i > 0 {
@@ -85,20 +102,20 @@ func (p *UserService) CreateNewUser(name, mail, password string, role role.Role)
 		return errors.New("Diese E-Mail Adresse wird bereits verwendet")
 	}
 
-	uid := uuid.NewV4()
 	hp, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		return errors.New("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.")
 	}
 
 	u := userModel{
-		UUID:     uid,
+		UUID:     uuid.NewV4(),
 		Username: name,
 		Mail:     mail,
 		Password: hp,
 		Role:     role,
 		Created:  time.Now(),
 		Active:   true,
+		PublicID: uuid.NewV4(),
 	}
 
 	return p.collection.Insert(&u)

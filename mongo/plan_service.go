@@ -42,6 +42,12 @@ func (p *PlanService) GetPlanByUUID(UId uuid.UUID) (*PlanModel, error) {
 	return &results, err
 }
 
+func (p *PlanService) GetNewestPlanFromUser(UId uuid.UUID) (*PlanModel, error) {
+	var result PlanModel
+	err := p.collection.Find(bson.M{"useruuid": UId}).Sort("-erstellt").One(&result)
+	return &result, err
+}
+
 func (p *PlanService) GetPlanByUUIDPublic(UId uuid.UUID) (*PlanModel, error) {
 	var results PlanModel
 	err := p.collection.Find(bson.M{"uuid": UId}).One(&results)

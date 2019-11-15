@@ -16,6 +16,7 @@ func main() {
 
 	flag.StringVar(&handler.MailPW, "pw", "", "Password for MailServer")
 	local := flag.Bool("local", false, "Run Server on Local Machine")
+	update := flag.Bool("update", false, "Run Update Function")
 	noTLS := flag.Bool("notls", false, "Disable TLS for Webserver")
 	flag.Parse()
 
@@ -24,6 +25,10 @@ func main() {
 	} else {
 		handler.InitHandler("mongo:27017")
 		gin.SetMode(gin.ReleaseMode)
+	}
+
+	if *update {
+		handler.Update()
 	}
 
 	r := gin.Default()
