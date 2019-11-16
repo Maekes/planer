@@ -134,7 +134,7 @@
               <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">
                 <div class="input">
                   <input type="text" name="{{.UUID}}" class="form-control py-0" placeholder="leer" onblur="autosave(this)"
-                    value="{{.InfoForPlan}}">
+                    value="{{.InfoForPlan}}" autocomplete="off" >
                 </div>
               </td>
               <td class="text-center pt-2 pb-2">

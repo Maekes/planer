@@ -153,38 +153,65 @@
                 </script>
 
                 <div class="stickyNameList" id="nameList">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Sortieren nach:</label>
+                            {{if eq .sortBy "name"}}
 
-                    <label class="form-label">Sortieren nach:</label>
-                    {{if eq .sortBy "name"}}
-                    <a href="/zuordnen/{{.UUID}}?sortBy=name" id="sortName" class="btn btn-primary btn-sm mb-5"><i
-                            class="fa fa-sort-alpha-asc mr-2"></i>Name</a>
-                    <a href="/zuordnen/{{.UUID}}?sortBy=group" id="sortGroup"
-                        class="btn btn-outline-primary btn-sm mb-5"><i class="fa fa-group mr-2"></i>Gruppe</a>
+                            <a href="/zuordnen/{{.UUID}}?sortBy=name" id="sortName"
+                                class="btn btn-primary btn-sm mb-5"><i class="fa fa-sort-alpha-asc mr-2"></i>Name</a>
+                            <a href="/zuordnen/{{.UUID}}?sortBy=group" id="sortGroup"
+                                class="btn btn-outline-primary btn-sm mb-5"><i class="fa fa-group mr-2"></i>Gruppe</a>
 
-                    {{else if eq .sortBy "group"}}
-                    <a href="/zuordnen/{{.UUID}}?sortBy=name" id="sortName"
-                        class="btn btn-outline-primary btn-sm mb-5"><i class="fa fa-sort-alpha-asc mr-2"></i>Name</a>
-                    <a href="/zuordnen/{{.UUID}}?sortBy=group" id="sortGroup" class="btn btn-primary btn-sm mb-5"><i
-                            class="fa fa-group mr-2"></i>Gruppe</a>
-                    {{end}}
-
+                            {{else if eq .sortBy "group"}}
+                            <a href="/zuordnen/{{.UUID}}?sortBy=name" id="sortName"
+                                class="btn btn-outline-primary btn-sm mb-5"><i
+                                    class="fa fa-sort-alpha-asc mr-2"></i>Name</a>
+                            <a href="/zuordnen/{{.UUID}}?sortBy=group" id="sortGroup"
+                                class="btn btn-primary btn-sm mb-5"><i class="fa fa-group mr-2"></i>Gruppe</a>
+                            {{end}}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Suche:</label>
+                            <div class="input">
+                                <input type="text" class="form-control py-0 " placeholder="Name" id="search" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
                     <div class="stickyNameScroll" id="namesList">
                         {{range $index, $value := .minisPayload}}
                         <div class="tags mt-0 mb-5">
                             {{range $index, $value := $value}}
                             <span class="col tag mr-0" id="{{.UUID}}" draggable="true" onclick="markMini(this)">
                                 <label class="custom-control custom-checkbox mb-0 mr-1" style="margin-top: -2px;">
-                                    <input type="checkbox" class="custom-control-input" {{isFinished .UUID $.UUID}} onchange="setFinish(this, {{.UUID}}, {{$.UUID}})">
+                                    <input type="checkbox" class="custom-control-input" {{isFinished .UUID $.UUID}}
+                                        onchange="setFinish(this, {{.UUID}}, {{$.UUID}})"  >
                                     <span class="custom-control-label"></span>
                                 </label>
                                 <h5 class="m-0 pt-1 pr-2 pl-2 avatar-{{.Gruppe}}"> {{countInPlan .UUID $.UUID}}</h5>
-                                <h5 class="m-1 pr-1">{{.Nachname}}, {{.Vorname}}</h5>
+                                <h5 class="m-1 pr-1 namelabel">{{.Nachname}}, {{.Vorname}}</h5>
                             </span>
                             {{end}}
                         </div>
                         {{end}}
                     </div>
                 </div>
+
+                <script>
+                    var $rows = $('span .namelabel');
+                    $('#search').keyup(function () {
+
+                        var val = '^(?=.*\\b' + $.trim($(this).val()).split(/\s+/).join('\\b)(?=.*\\b') + ').*$',
+                            reg = RegExp(val, 'i'),
+                            text;
+                            $rows.parent().show()
+                        $rows.show().filter(function () {
+                            text = $(this).text().replace(/\s+/g, ' ');
+                            return !reg.test(text);
+                        }).parent().hide();
+                    });
+
+                </script>
 
                 <script>
                     // When the user scrolls the page, execute myFunction 
@@ -259,7 +286,7 @@
     function setFinish(cb, uid, pid) {
         removeMarking()
         const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/zuordnen/finish?uid=" + uid + "&status=" + cb.checked + "&pid=" +pid);
+        xhttp.open("POST", "/zuordnen/finish?uid=" + uid + "&status=" + cb.checked + "&pid=" + pid);
         xhttp.send();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 0) {

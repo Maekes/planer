@@ -70,9 +70,11 @@
           </div>
 
           <div class="card-options">
-            <a href="/messdienerplan/pdf/{{.UUID}}" class="btn btn-outline-danger btn-sm"><i
+              <a href="/messdienerplan/pdf/{{.UUID}}" class="btn btn-outline-success btn-sm"><i
+                class="fa fa-table"></i> Excel</a>
+            <a href="/messdienerplan/pdf/{{.UUID}}" class="btn btn-outline-danger btn-sm ml-2"><i
                 class="fa fa-file-pdf-o"></i> PDF</a>
-            <a href="/zuordnen/{{.UUID}}" class="btn btn-outline-secondary btn-sm ml-2"><i class="fe fe-edit"></i>
+            <a href="/zuordnen/{{.UUID}}?sortBy=name" class="btn btn-outline-secondary btn-sm ml-2"><i class="fe fe-edit"></i>
               Messdiener eintragen</a>
             <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
           </div>

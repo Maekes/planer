@@ -42,9 +42,7 @@ docker-compose up -d
 ## Updating the service
 If you want to update planer after changes have made simply stop the service, rebuild it and start it again:
 ```
-docker stop planer
-docker build planer
-docker start planer
+docker stop planer & docker rmi planer_planer -f & docker build planer & docker start planer
 ```
 
 If something not working after update
