@@ -174,7 +174,8 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Suche:</label>
                             <div class="input">
-                                <input type="text" class="form-control py-0 " placeholder="Name" id="search" autocomplete="off">
+                                <input type="text" class="form-control py-0 " placeholder="Name" id="search"
+                                    autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -185,7 +186,7 @@
                             <span class="col tag mr-0" id="{{.UUID}}" draggable="true" onclick="markMini(this)">
                                 <label class="custom-control custom-checkbox mb-0 mr-1" style="margin-top: -2px;">
                                     <input type="checkbox" class="custom-control-input" {{isFinished .UUID $.UUID}}
-                                        onchange="setFinish(this, {{.UUID}}, {{$.UUID}})"  >
+                                        onchange="setFinish(this, {{.UUID}}, {{$.UUID}})">
                                     <span class="custom-control-label"></span>
                                 </label>
                                 <h5 class="m-0 pt-1 pr-2 pl-2 avatar-{{.Gruppe}}"> {{countInPlan .UUID $.UUID}}</h5>
@@ -199,18 +200,32 @@
 
                 <script>
                     var $rows = $('span .namelabel');
-                    $('#search').keyup(function () {
+                    $('#search').keyup(debounce(function () {
 
                         var val = '^(?=.*\\b' + $.trim($(this).val()).split(/\s+/).join('\\b)(?=.*\\b') + ').*$',
                             reg = RegExp(val, 'i'),
                             text;
-                            $rows.parent().show()
+                        $rows.parent().show()
                         $rows.show().filter(function () {
                             text = $(this).text().replace(/\s+/g, ' ');
                             return !reg.test(text);
                         }).parent().hide();
-                    });
+                    }, 150));
 
+                    function debounce(func, wait, immediate) {
+                        var timeout;
+                        return function () {
+                            var context = this, args = arguments;
+                            var later = function () {
+                                timeout = null;
+                                if (!immediate) func.apply(context, args);
+                            };
+                            var callNow = immediate && !timeout;
+                            clearTimeout(timeout);
+                            timeout = setTimeout(later, wait);
+                            if (callNow) func.apply(context, args);
+                        };
+                    };
                 </script>
 
                 <script>
