@@ -318,11 +318,13 @@ func ZuordnenHandler(c *gin.Context) {
 }
 
 func MessdienerplanHandler(c *gin.Context) {
-
+	// TODO Handle error
 	plan, _ := planService.GetAllPlan()
+	maxDate, _ := messeService.GetMaxDate()
 	c.HTML(http.StatusOK, "messdienerplan", gin.H{
 		"title":       "Messdienerplan",
 		"planPayload": plan,
+		"maxDate":     maxDate,
 		"username":    userService.GetUsernameByID(miniService.AktUser),
 		"role":        userService.GetRoleByID(miniService.AktUser),
 	})
@@ -330,8 +332,12 @@ func MessdienerplanHandler(c *gin.Context) {
 func MessdienerplanCreateHandler(c *gin.Context) {
 
 	l, err := time.LoadLocation("Europe/Berlin")
-	from, err := time.ParseInLocation("02.01.2006", c.PostForm("from"), l)
-	to, err := time.ParseInLocation("02.01.2006", c.PostForm("to"), l)
+	daterange := strings.Split(c.PostForm("daterange"), " - ")
+	if len(daterange) != 2 {
+		Error404Handler(c)
+	}
+	from, err := time.ParseInLocation("02.01.2006", daterange[0], l)
+	to, err := time.ParseInLocation("02.01.2006", daterange[1], l)
 
 	fromDate := time.Date(from.Year(), from.Month(), from.Day(), 0, 0, 0, 0, l)
 	toDate := time.Date(to.Year(), to.Month(), to.Day(), 23, 59, 59, 0, l)
@@ -517,7 +523,31 @@ func ZuordnenDeleteHandler(c *gin.Context) {
 		c.Status(http.StatusOK)
 	}
 
-	//fmt.Println(messeService.GetAllMessenThatAreRelevant())
+	c.Redirect(http.StatusFound, "/minis")
+}
+
+func ZuordnenFinishHandler(c *gin.Context) {
+	uid := c.Query("uid")
+	pid := c.Query("pid")
+	status := c.Query("status")
+
+	uuuid, err := uuid.FromString(uid)
+	puuid, err := uuid.FromString(pid)
+	b, err := strconv.ParseBool(status)
+	if b {
+		err = planService.AddFinished(uuuid, puuid)
+
+	} else {
+		err = planService.RemoveFinished(uuuid, puuid)
+	}
+
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusNoContent)
+	} else {
+		c.Status(http.StatusOK)
+	}
+
 	c.Redirect(http.StatusFound, "/minis")
 }
 

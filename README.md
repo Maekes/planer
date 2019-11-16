@@ -46,3 +46,8 @@ docker stop planer
 docker build planer
 docker start planer
 ```
+
+If something not working after update
+```
+docker rmi planer_planer -f
+```

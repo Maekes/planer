@@ -18,7 +18,8 @@
           <div class="form-group">
             <label class="form-label">Datum & Uhrzeit</label>
             <input type="text" name="date" data-timepicker="true" id="datepicker" class="form-control datepicker-here"
-              placeholder="" data-language="de" data-position="right top" placeholder="01.02.2019 11:30" required />
+              placeholder="00.00.000 00:00" data-language="de" data-position="bottom left"
+              placeholder="01.02.2019 11:30" required readonly autocomplete="off" />
           </div>
           <script>
 
@@ -72,21 +73,22 @@
         </div>
       </form>
 
-      <form  method="POST" action="/messen/deleteAll">
+      <form method="POST" action="/messen/deleteAll">
         <div class="card card-collapsed">
-        <div class="card-status card-status bg-red"></div>
-        <div class="card-header">
-          <h3 class="card-title"><i class="fe fe-trash-2"></i> Alle Messen löschen</h3>
-          <div class="card-options">
-            <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+          <div class="card-status card-status bg-red"></div>
+          <div class="card-header">
+            <h3 class="card-title"><i class="fe fe-trash-2"></i> Alle Messen löschen</h3>
+            <div class="card-options">
+              <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+            </div>
           </div>
-        </div>
-        <div class="card-body">
-          <p>Mit einem Klick werden sofort alle angelegten Messen gelöscht. <b>Achtung:</b> Auch bereits erstellte Pläne können nicht mehr korrekt bearbeitet oder als PDF heruntergeladen werden!</p>
-        </div>
-        <div class="card-footer text-right">
-          <button submit class="btn btn-red"><i class="fe fe-trash-2"></i> Alle Messen Löschen</button>
-        </div>
+          <div class="card-body">
+            <p>Mit einem Klick werden sofort alle angelegten Messen gelöscht. <b>Achtung:</b> Auch bereits erstellte
+              Pläne können nicht mehr korrekt bearbeitet oder als PDF heruntergeladen werden!</p>
+          </div>
+          <div class="card-footer text-right">
+            <button submit class="btn btn-red"><i class="fe fe-trash-2"></i> Alle Messen Löschen</button>
+          </div>
         </div>
       </form>
 
@@ -108,8 +110,8 @@
               <th>Datum</th>
               <th>Zeit</th>
               <th>Gottesdienst</th>
-              <th>Liturgischer Tag</th>
-              <th>Bemerkungen</th>
+              <th>Litur. Tag / Bemerkung</th>
+              <th>Info im Plan</th>
               <th class="text-center"><i class="icon-settings"></i></th>
               <th class="text-center"><i class="icon-settings"></i></th>
             </tr>
@@ -127,8 +129,14 @@
               <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{getDate .Datum}}</td>
               <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{getTime .Datum}}</td>
               <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{.Gottesdienst}}</td>
-              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{.LiturgischerTag}}</td>
-              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">{{.Bemerkung}}</td>
+              <td class=" {{if not .IsRelevant}}text-muted{{end}} py-1 small" name="{{convert .UUID}}">L:
+                {{.LiturgischerTag}} <br>B: {{.Bemerkung}}</td>
+              <td class=" {{if not .IsRelevant}}text-muted{{end}}" name="{{convert .UUID}}">
+                <div class="input">
+                  <input type="text" name="{{.UUID}}" class="form-control py-0" placeholder="leer" onblur="autosave(this)"
+                    value="{{.InfoForPlan}}">
+                </div>
+              </td>
               <td class="text-center pt-2 pb-2">
                 <a href="#" class="icon"
                   onclick="edit({{getDate .Datum}},{{getTime .Datum}}, {{.Gottesdienst}},{{.LiturgischerTag}},{{.Bemerkung}}, {{.UUID}} ) "><i
@@ -147,6 +155,18 @@
     </div>
   </div>
 </div>
+
+<script>
+
+  function autosave(t) {
+    const xhttp = new XMLHttpRequest();
+    uid = t.getAttribute("name")
+    value = t.value
+    xhttp.open("POST", "/zuordnen/editInfoForPlan?uid=" + uid + "&value=" + value);
+    xhttp.send();
+  }
+
+</script>
 
 
 {{end}}

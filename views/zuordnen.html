@@ -1,217 +1,227 @@
 {{define "content"}}
 
+<div onclick="removeMarking()">
+    <div class="container">
+        <div class="page-header">
 
-<div class="container" onclick="removeMarking()">
-    <div class="page-header">
 
-
-        <div class="text-wrap">
-            <h1 class="page-title mb-2">
-                Messdienerplan <b class="ml-3"> {{.planTitle}}</b>
-            </h1>
-            <p class="leading-tight mb-0"><i class="fe fe-calendar mr-1"></i> {{.from}} - {{.to}}
-            </p>
-        </div>
-
-    </div>
-    <p>Hier kannst du deine Messdiener in den Plan eintragen. Alle Daten werden automatisch gespeichert.</p>
-
-    <div class="row row-cards" id="container">
-        <div class="col-md-8">
-            <div class="alert alert-success alert-icon hideCard" id="hinweis">
-
-                <i class="fe fe-alert-triangle mr-2" aria-hidden="true"></i>
-                <h4 class="mb-1">Hinweis zur Rückmeldung</h4>
-                <p class="mb-0" id="hinweisText">
-                    Lorem ipsum Minim ad pariatur eiusmod ea ut nulla aliqua est quis id dolore minim
-                    voluptate.
+            <div class="text-wrap">
+                <h1 class="page-title mb-2">
+                    Messdienerplan <b class="ml-3"> {{.planTitle}}</b>
+                </h1>
+                <p class="leading-tight mb-0"><i class="fe fe-calendar mr-1"></i> {{.from}} - {{.to}}
                 </p>
-
             </div>
-            {{range $index, $value := .messenPayload}}
-            <div class="card mb-3" id="card-{{.UUID}}">
-                <div class="card-status card-status-left bg-blue"></div>
-                <div class="card-header pl-4 pr-4">
-                    <div class="col-md-4">
-                        <div class="text-wrap">
-                            <h4 class="mb-0">{{.Gottesdienst}} </h4>
-                            <p class="leading-tight mb-0">{{getDay .Datum}} - {{getDate .Datum}} -
-                                {{getTime .Datum}}
-                            </p>
+
+        </div>
+        <p>Hier kannst du deine Messdiener in den Plan eintragen. Alle Daten werden automatisch gespeichert.</p>
+
+        <div class="row row-cards" id="container">
+            <div class="col-md-8">
+                <div class="alert alert-success alert-icon hideCard" id="hinweis">
+
+                    <i class="fe fe-alert-triangle mr-2" aria-hidden="true"></i>
+                    <h4 class="mb-1">Hinweis zur Rückmeldung</h4>
+                    <p class="mb-0" id="hinweisText">
+                        Lorem ipsum Minim ad pariatur eiusmod ea ut nulla aliqua est quis id dolore minim
+                        voluptate.
+                    </p>
+                </div>
+                {{range $indexWoche, $valueMessen := getMessenDividedInWeeks .messenPayload}}
+                <h3>Woche {{add $indexWoche 1}}</h3>
+                {{range $index, $value := .Messen}}
+                <div class="card mb-3" id="card-{{.UUID}}">
+                    <div class="card-status card-status-left bg-blue"></div>
+                    <div class="card-header pl-4 pr-4">
+                        <div class="col-md-4">
+                            <div class="text-wrap">
+                                <h4 class="mb-0">{{.Gottesdienst}} </h4>
+                                <p class="leading-tight mb-0">{{getDay .Datum}} - {{getDate .Datum}} -
+                                    {{getTime .Datum}}
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-wrap">
-                            <p class="leading-tight tracking-tight mb-0"> <b>T: </b>{{.LiturgischerTag}}</p>
-                            <p class="leading-tight tracking-tight mb-0"> <b>B: </b>{{.Bemerkung}}</p>
+                        <div class="col-md-4">
+                            <div class="text-wrap">
+                                <p class="leading-tight tracking-tight mb-0"> <b>T: </b>{{.LiturgischerTag}}</p>
+                                <p class="leading-tight tracking-tight mb-0"> <b>B: </b>{{.Bemerkung}}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group align-middle mb-0">
-                            <div class="input">
-                                <input type="text" name="{{.UUID}}" class="form-control" placeholder="Info für den Plan"
-                                    onblur="autosave(this)" value="{{.InfoForPlan}}">
+                        <div class="col-md-4">
+                            <div class="form-group align-middle mb-0">
+                                <div class="input">
+                                    <input type="text" name="{{.UUID}}" class="form-control"
+                                        placeholder="Info für den Plan" onblur="autosave(this)"
+                                        value="{{.InfoForPlan}}">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-header pt-1 pb-1 pl-4 pr-4" style="min-height: 0">
-                    <div class="col-md-auto">
-                        <p class="leading-tight mt-1 mb-0"><b>Rückmeldungen:</b>
-                        </p></div>
+                    <div class="card-header pt-1 pb-1 pl-4 pr-4" style="min-height: 0">
+                        <div class="col-md-auto">
+                            <p class="leading-tight mt-1 mb-0"><b>Rückmeldungen:</b>
+                            </p>
+                        </div>
                         <div class="col-md-9">
                             <div class="tags">
                                 {{range $index, $value := .Rueckmeldungen}}
                                 <span class="tag tag-outline-darkgray">{{$value}}</span>
                                 {{end}}
                             </div>
-                        
+
+                        </div>
+                    </div>
+
+                    <div class="card-body pt-3 pb-2" style="min-height: 40px" id="{{.UUID}}"
+                        ondrop="handleDrop(event, this)">
+                        <div class="tags">
+                            {{if not .MinisForPlan}}
+
+                            {{else}}
+                            {{range $index, $value := .MinisForPlan}}
+
+                            <span class="tag" name="{{$value}}" onclick="markMiniAtMesse(this)">
+                                <h5 class="m-1 pr-1">{{getMiniNameFromUUID $value}}</h5>
+                                <h5 style="cursor: pointer;"
+                                    class="m-0 pt-1 pr-2 pl-2 avatar-{{getMiniGruppeUUID $value}}"
+                                    onclick="deleteMiniFromMesse(this);">X</h5>
+                            </span>
+
+                            {{end}}
+                            {{end}}
+                        </div>
                     </div>
                 </div>
-
-                <div class="card-body pt-3 pb-2" style="min-height: 40px" id="{{.UUID}}"
-                    ondrop="handleDrop(event, this)">
-                    <div class="tags">
-                        {{if not .MinisForPlan}}
-
-                        {{else}}
-                        {{range $index, $value := .MinisForPlan}}
-
-                        <span class="tag" name="{{$value}}" onclick="markMiniAtMesse(this)">
-                            <h5 class="m-1 pr-1">{{getMiniNameFromUUID $value}}</h5>
-                            <h5 style="cursor: pointer;" class="m-0 pt-1 pr-2 pl-2 avatar-{{getMiniGruppeUUID $value}}"
-                                onclick="deleteMiniFromMesse(this);">X</h5>
-                        </span>
-
-                        {{end}}
-                        {{end}}
-                    </div>
-                </div>
-            </div>
-            {{end}}
-        </div>
-        <div class="col-md-4">
-
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title"><b>Rückmeldungen</b></h3>
-                    <div class="card-options">
-                        <button href="#" class="btn btn-primary btn-sm ml-2" id="ausblendenButton" disabled
-                            onclick="showAll()">Auswahl aufheben</button>
-                    </div>
-                </div>
-                <table class="table card-table table-hover table-outline table-vcenter text-nowrap"
-                    style="display: block; overflow: auto; height: 20vh;">
-                    <tr style="width: 100%; display: table-cell;"></tr>
-                    {{range $index, $value := .rueckmeldungen}}
-                    <tr onclick="hideIrrelevant('{{.Messen}}', '{{.Hinweis}}', this)" style="cursor: pointer;">
-                        <td class="pt-2 pb-2">{{.Name}}</td>
-                        <td class="text-right pt-1 pb-1">
-                            <span class="badge badge-default">{{getDate .Zeit}} - {{getTime .Zeit}}</span>
-                        </td>
-                    </tr>
-                    {{end}}
-                </table>
-            </div>
-
-            <script>
-
-                function hideIrrelevant(messen, hinweis, element) {
-                    showAll()
-                    $('.card.mb-3').addClass('hideCard');
-                    $('#ausblendenButton').removeAttr('disabled');
-                    messen = messen.replace('[', '')
-                    messen = messen.replace(']', '')
-                    messen = messen.split(" ")
-                    console.log(messen)
-
-                    for (let i = 0; i < messen.length; i++) {
-                        $('#card-' + messen[i]).removeClass('hideCard');
-                    }
-
-                    element.classList.add('table-success');
-
-                    if (hinweis != '') {
-                        $('#hinweis').removeClass('hideCard');
-                        $('#hinweisText').text(hinweis);
-                    }
-                }
-
-                function showAll() {
-                    $('.table-success').removeClass('table-success');
-                    $('.hideCard').removeClass('hideCard');
-                    $('#hinweis').addClass('hideCard');
-                    $('#ausblendenButton').attr('disabled', true);
-                }
-
-            </script>
-
-            <div class="stickyNameList" id="nameList">
-
-                <label class="form-label">Sortieren nach:</label>
-                {{if eq .sortBy "name"}}
-                <a href="/zuordnen/{{.UUID}}?sortBy=name" id="sortName" class="btn btn-primary btn-sm mb-5"><i
-                        class="fa fa-sort-alpha-asc mr-2"></i>Name</a>
-                <a href="/zuordnen/{{.UUID}}?sortBy=group" id="sortGroup" class="btn btn-outline-primary btn-sm mb-5"><i
-                        class="fa fa-group mr-2"></i>Gruppe</a>
-
-                {{else if eq .sortBy "group"}}
-                <a href="/zuordnen/{{.UUID}}?sortBy=name" id="sortName" class="btn btn-outline-primary btn-sm mb-5"><i
-                        class="fa fa-sort-alpha-asc mr-2"></i>Name</a>
-                <a href="/zuordnen/{{.UUID}}?sortBy=group" id="sortGroup" class="btn btn-primary btn-sm mb-5"><i
-                        class="fa fa-group mr-2"></i>Gruppe</a>
                 {{end}}
+                <div class="m-5"></div>
+                {{end}}
+            </div>
+            <div class="col-md-4">
 
-                <div class="stickyNameScroll" id="namesList">
-                    {{range $index, $value := .minisPayload}}
-                    <div class="tags mt-0 mb-5">
-                        {{range $index, $value := $value}}
-                        <span class="col tag mr-0" id="{{.UUID}}" draggable="true" onclick="markMini(this)">
-                            <h5 class="m-0 pt-1 pr-2 pl-2 avatar-{{.Gruppe}}"> {{countInPlan .UUID $.UUID}}</h5>
-                            <h5 class="m-1 pr-1">{{.Nachname}}, {{.Vorname}}</h5>
-                        </span>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><b>Rückmeldungen</b></h3>
+                        <div class="card-options">
+                            <button href="#" class="btn btn-primary btn-sm ml-2" id="ausblendenButton" disabled
+                                onclick="showAll()">Auswahl aufheben</button>
+                        </div>
+                    </div>
+                    <table class="table card-table table-hover table-outline table-vcenter text-nowrap"
+                        style="display: block; overflow: auto; height: 20vh;">
+                        <tr style="width: 100%; display: table-cell;"></tr>
+                        {{range $index, $value := .rueckmeldungen}}
+                        <tr onclick="hideIrrelevant('{{.Messen}}', '{{.Hinweis}}', this)" style="cursor: pointer;">
+                            <td class="pt-2 pb-2">{{.Name}}</td>
+                            <td class="text-right pt-1 pb-1">
+                                <span class="badge badge-default">{{getDate .Zeit}} - {{getTime .Zeit}}</span>
+                            </td>
+                        </tr>
+                        {{end}}
+                    </table>
+                </div>
+
+                <script>
+
+                    function hideIrrelevant(messen, hinweis, element) {
+                        showAll()
+                        $('.card.mb-3').addClass('hideCard');
+                        $('#ausblendenButton').removeAttr('disabled');
+                        messen = messen.replace('[', '')
+                        messen = messen.replace(']', '')
+                        messen = messen.split(" ")
+                        console.log(messen)
+
+                        for (let i = 0; i < messen.length; i++) {
+                            $('#card-' + messen[i]).removeClass('hideCard');
+                        }
+
+                        element.classList.add('table-success');
+
+                        if (hinweis != '') {
+                            $('#hinweis').removeClass('hideCard');
+                            $('#hinweisText').text(hinweis);
+                        }
+                    }
+
+                    function showAll() {
+                        $('.table-success').removeClass('table-success');
+                        $('.hideCard').removeClass('hideCard');
+                        $('#hinweis').addClass('hideCard');
+                        $('#ausblendenButton').attr('disabled', true);
+                    }
+
+                </script>
+
+                <div class="stickyNameList" id="nameList">
+
+                    <label class="form-label">Sortieren nach:</label>
+                    {{if eq .sortBy "name"}}
+                    <a href="/zuordnen/{{.UUID}}?sortBy=name" id="sortName" class="btn btn-primary btn-sm mb-5"><i
+                            class="fa fa-sort-alpha-asc mr-2"></i>Name</a>
+                    <a href="/zuordnen/{{.UUID}}?sortBy=group" id="sortGroup"
+                        class="btn btn-outline-primary btn-sm mb-5"><i class="fa fa-group mr-2"></i>Gruppe</a>
+
+                    {{else if eq .sortBy "group"}}
+                    <a href="/zuordnen/{{.UUID}}?sortBy=name" id="sortName"
+                        class="btn btn-outline-primary btn-sm mb-5"><i class="fa fa-sort-alpha-asc mr-2"></i>Name</a>
+                    <a href="/zuordnen/{{.UUID}}?sortBy=group" id="sortGroup" class="btn btn-primary btn-sm mb-5"><i
+                            class="fa fa-group mr-2"></i>Gruppe</a>
+                    {{end}}
+
+                    <div class="stickyNameScroll" id="namesList">
+                        {{range $index, $value := .minisPayload}}
+                        <div class="tags mt-0 mb-5">
+                            {{range $index, $value := $value}}
+                            <span class="col tag mr-0" id="{{.UUID}}" draggable="true" onclick="markMini(this)">
+                                <label class="custom-control custom-checkbox mb-0 mr-1" style="margin-top: -2px;">
+                                    <input type="checkbox" class="custom-control-input" {{isFinished .UUID $.UUID}} onchange="setFinish(this, {{.UUID}}, {{$.UUID}})">
+                                    <span class="custom-control-label"></span>
+                                </label>
+                                <h5 class="m-0 pt-1 pr-2 pl-2 avatar-{{.Gruppe}}"> {{countInPlan .UUID $.UUID}}</h5>
+                                <h5 class="m-1 pr-1">{{.Nachname}}, {{.Vorname}}</h5>
+                            </span>
+                            {{end}}
+                        </div>
                         {{end}}
                     </div>
-                    {{end}}
                 </div>
+
+                <script>
+                    // When the user scrolls the page, execute myFunction 
+                    window.onscroll = function () { myFunction() };
+
+                    // Get the header
+                    var header2 = document.getElementById("nameList");
+                    var nameList = document.getElementById("namesList");
+
+                    // Get the offset position of the navbar
+                    var sticky = document.getElementById("container").offsetTop;
+
+                    // Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
+                    function myFunction() {
+                        if (window.pageYOffset > sticky) {
+                            header2.classList.add("stickyNameListFixed");
+                            header2.classList.remove("stickyNameList");
+
+                            nameList.classList.add("stickyNameScrollFixed");
+                            nameList.classList.remove("stickyNameScroll");
+
+
+                        } else {
+                            header2.classList.add("stickyNameList");
+                            header2.classList.remove("stickyNameListFixed");
+
+                            nameList.classList.add("stickyNameScroll");
+                            nameList.classList.remove("stickyNameScrollFixed");
+
+                        }
+                    }</script>
+
             </div>
-
-            <script>
-                // When the user scrolls the page, execute myFunction 
-                window.onscroll = function () { myFunction() };
-
-                // Get the header
-                var header2 = document.getElementById("nameList");
-                var nameList = document.getElementById("namesList");
-
-                // Get the offset position of the navbar
-                var sticky = document.getElementById("container").offsetTop;
-
-                // Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
-                function myFunction() {
-                    if (window.pageYOffset > sticky) {
-                        header2.classList.add("stickyNameListFixed");
-                        header2.classList.remove("stickyNameList");
-
-                        nameList.classList.add("stickyNameScrollFixed");
-                        nameList.classList.remove("stickyNameScroll");
-
-
-                    } else {
-                        header2.classList.add("stickyNameList");
-                        header2.classList.remove("stickyNameListFixed");
-
-                        nameList.classList.add("stickyNameScroll");
-                        nameList.classList.remove("stickyNameScrollFixed");
-
-                    }
-                }</script>
-
         </div>
     </div>
 </div>
 </div>
-
 <style>
     .over {
         background-color: rgb(252, 255, 249);
@@ -242,6 +252,19 @@
             }
             if (this.readyState == 4 && this.status == 0) {
                 alert("Konnte keine Verbindung zum Server aufbauen!\nStatus bleibt unverändert.")
+            }
+        }
+    }
+
+    function setFinish(cb, uid, pid) {
+        removeMarking()
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/zuordnen/finish?uid=" + uid + "&status=" + cb.checked + "&pid=" +pid);
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 0) {
+                alert("Konnte keine Verbindung zum Server aufbauen!\nStatus bleibt unverändert.")
+                cb.value = !cb.value
             }
         }
     }

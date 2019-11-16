@@ -71,6 +71,19 @@ var C = goview.Config{
 			}
 			return messeService.CountMiniInMessen(plan.Von, plan.Bis, m)
 		},
+		"isFinished": func(m uuid.UUID, p uuid.UUID) string {
+			//TODO hight cost
+			minis, err := planService.GetFinishedMinis(p)
+
+			if err != nil {
+				//TODO
+			}
+			b := contains(minis, m)
+			if b {
+				return "checked"
+			}
+			return ""
+		},
 		"getMessen": func(f time.Time, t time.Time) string {
 			var output []string
 			messen, err := messeService.GetAllMessenThatAreRelevantFromToDate(f, t)
@@ -110,7 +123,7 @@ var C = goview.Config{
 				}
 				w = append(w, whelper)
 			} else {
-				log.Println("No Messen Found to Divide")
+				log.Println("No Messen Found to divide")
 				//TODO
 			}
 			return &w
@@ -167,4 +180,13 @@ func toGermanShort(d string) string {
 	default:
 		return d
 	}
+}
+
+func contains(s []uuid.UUID, e uuid.UUID) bool {
+	for _, a := range s {
+		if uuid.Equal(a, e) {
+			return true
+		}
+	}
+	return false
 }

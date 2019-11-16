@@ -30,14 +30,14 @@ $nameListHeightFixed: 80vh;
   height: $nameListHeightFixed;
 }
 
-
+ 
 .hideCard{
   position: absolute !important;
   visibility: hidden;
 }
 
 
-.tag-outline-darkgray{
+.tag-outline-darkgray{ 
   background-color: $white !important;
   border-color: $gray-900;
   border-width: 1px;
@@ -45,4 +45,7 @@ $nameListHeightFixed: 80vh;
   color: $gray-900 !important;
 }
 
+.form-control[readonly]{
+  background-color: $white !important;
+}
 

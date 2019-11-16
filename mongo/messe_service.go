@@ -147,6 +147,19 @@ func (p *MesseService) GetAllMessenThatAreRelevantFromToDatePublic(fromDate, toD
 
 }
 
+func (p *MesseService) GetMaxDate() (time.Time, error) {
+	var results MesseModel
+	err := p.collection.Find(
+		bson.M{
+			"useruuid":   p.aktUser,
+			"isrelevant": true,
+		}).Sort("-datum").One(&results)
+	if err != nil {
+		return time.Now(), err
+	}
+	return results.Datum, nil
+}
+
 func (p *MesseService) AddMiniToMesse(UId uuid.UUID, m MiniModel) error {
 
 	// Update the necessary 'Company' document

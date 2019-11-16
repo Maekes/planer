@@ -73,6 +73,7 @@ func main() {
 		auth.POST("/zuordnen/draged", handler.ZuordnenDragedHandler)
 		auth.POST("/zuordnen/editInfoForPlan", handler.ZuordnenEditInfoForPlandHandler)
 		auth.POST("/zuordnen/delete", handler.ZuordnenDeleteHandler)
+		auth.POST("/zuordnen/finish", handler.ZuordnenFinishHandler)
 
 		auth.POST("/messen", handler.AddMessenHandler)
 		auth.GET("/messen/delete/:id", handler.MessenDeleteHandler)

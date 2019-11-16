@@ -42,6 +42,10 @@
   color: #212529 !important;
 }
 
+.form-control[readonly], .dataTables_wrapper .dataTables_length select[readonly], .dataTables_wrapper .dataTables_filter input[readonly] {
+  background-color: #fff !important;
+}
+
 /*!
  * Bootstrap v4.0.0 (https://getbootstrap.com)
  * Copyright 2011-2018 The Bootstrap Authors

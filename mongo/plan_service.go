@@ -60,6 +60,23 @@ func (p *PlanService) DeletePlanById(uid uuid.UUID) error {
 	return err
 }
 
+func (p *PlanService) AddFinished(uid uuid.UUID, pid uuid.UUID) error {
+	err := p.collection.Update(bson.M{"useruuid": p.aktUser, "uuid": pid}, bson.M{"$addToSet": bson.M{"finishedminis": uid}})
+	return err
+}
+
+func (p *PlanService) RemoveFinished(uid uuid.UUID, pid uuid.UUID) error {
+	err := p.collection.Update(bson.M{"useruuid": p.aktUser, "uuid": pid}, bson.M{"$pull": bson.M{"finishedminis": uid}})
+	return err
+}
+
+func (p *PlanService) GetFinishedMinis(uid uuid.UUID) ([]uuid.UUID, error) {
+	var results PlanModel
+	err := p.collection.Find(bson.M{"uuid": uid, "useruuid": p.aktUser}).One(&results)
+
+	return results.FinishedMinis, err
+}
+
 func (p *PlanService) NewRueckmeldungPublic(name string, messen []string, hinweis string, planid uuid.UUID) {
 	var plan PlanModel
 	var r Rueckmeldung

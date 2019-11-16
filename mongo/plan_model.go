@@ -19,6 +19,7 @@ type PlanModel struct {
 	UserUUID            uuid.UUID
 	Rueckmeldungen      []Rueckmeldung
 	RueckmeldungHinweis string
+	FinishedMinis       []uuid.UUID
 }
 
 type Rueckmeldung struct {
