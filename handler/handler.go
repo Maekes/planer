@@ -399,7 +399,7 @@ func MessdienerplanPdfHandler(c *gin.Context) {
 	pagew, pageh := pdf.GetPageSize()
 	mleft, mright, _, mbottom := pdf.GetMargins()
 
-	cols := []float64{25, 25, 50, pagew - mleft - mright - 30 - 30 - 50}
+	cols := []float64{25, 25, 40, pagew - mleft - mright - 25 - 25 - 40}
 	rows := [][]string{}
 	rows = append(rows, []string{"Datum", "Zeit", "Messe", "Messdiener"})
 
