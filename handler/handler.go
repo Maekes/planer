@@ -135,7 +135,11 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	planid, err := uuid.FromString(uid)
 
 	if err != nil {
-		//TODO
+		c.JSON(200, gin.H{
+			"error":   error,
+			"message": "Es ist ein Fehler aufgetreten",
+		})
+		return
 	}
 
 	planService.NewRueckmeldungPublic(name, messen, hinweis, planid)
@@ -144,7 +148,13 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	for _, m := range messen {
 		uid, err := uuid.FromString(m)
 		if err != nil {
-			log.Println(err)
+			if err != nil {
+				c.JSON(200, gin.H{
+					"error":   error,
+					"message": "Es ist ein Fehler aufgetreten",
+				})
+				return
+			}
 		}
 		messeService.AddNameToMessePublic(name, uid)
 	}
@@ -164,14 +174,26 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		error = true
-		message = err.Error()
+		if err != nil {
+			c.JSON(200, gin.H{
+				"error":   error,
+				"message": "Es ist ein Fehler aufgetreten",
+			})
+			return
+		}
 	}
 
 	var tpl bytes.Buffer
 	if err := t.Execute(&tpl, r); err != nil {
 		log.Println(err)
 		error = true
-		message = err.Error()
+		if err != nil {
+			c.JSON(200, gin.H{
+				"error":   error,
+				"message": "Es ist ein Fehler aufgetreten",
+			})
+			return
+		}
 	}
 
 	result := tpl.String()
