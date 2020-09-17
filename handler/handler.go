@@ -136,7 +136,7 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(200, gin.H{
-			"error":   error,
+			"error":   true,
 			"message": "Es ist ein Fehler aufgetreten",
 		})
 		return

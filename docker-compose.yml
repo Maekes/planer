@@ -12,7 +12,7 @@ services:
       - "TZ=Europe/Berlin"
   mongo:
     container_name: mongo
-    image: nonoroazoro/rpi-mongo
+    image: mongo
     restart: always
     volumes:
       - "/opt/mongodb:/data/db"
