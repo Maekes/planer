@@ -11,15 +11,16 @@ import (
 )
 
 type userModel struct {
-	Id       bson.ObjectId `bson:"_id,omitempty"`
-	UUID     uuid.UUID
-	Username string
-	Password []byte
-	Mail     string
-	Role     role.Role
-	Created  time.Time
-	Active   bool
-	PublicID uuid.UUID
+	Id         bson.ObjectId `bson:"_id,omitempty"`
+	UUID       uuid.UUID
+	Username   string
+	Password   []byte
+	Mail       string
+	Role       role.Role
+	Created    time.Time
+	Active     bool
+	PublicID   uuid.UUID
+	Planfooter []string
 }
 
 type userSettings struct {

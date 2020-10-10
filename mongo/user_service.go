@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -57,7 +58,7 @@ func (p *UserService) GetUsernameByID(u uuid.UUID) string {
 	model := userModel{}
 	err := p.collection.Find(bson.M{"uuid": u}).One(&model)
 	if err != nil {
-		//TODO
+		log.Printf("User with Id %v not found: %v", u.String(), err)
 	}
 	return model.Username
 }
@@ -154,9 +155,19 @@ func (p *UserService) AdminChangeUserPasswordById(Id, password string) error {
 	return err
 }
 
-func (p *UserService) ChangeUserPasswordById(Id, password string) error {
-	uid, err := uuid.FromString(Id)
-	err = p.collection.Update(bson.M{"uuid": uid}, bson.M{"$set": bson.M{"password": password}})
+func (p *UserService) ChangeUserPasswordAktUser(passwordOld, passwordNew string) error {
+
+	err := p.ValidateUser(p.GetUsernameByID(p.aktUser), passwordOld)
+	if err != nil {
+		log.Printf("ValidationFailed: %v", err)
+		return err
+	}
+
+	hp, err := bcrypt.GenerateFromPassword([]byte(passwordNew), 10)
+	if err != nil {
+		return errors.New("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.")
+	}
+	err = p.collection.Update(bson.M{"uuid": p.aktUser}, bson.M{"$set": bson.M{"password": hp}})
 	return err
 }
 
@@ -171,15 +182,30 @@ func (p *UserService) ValidateUser(username, password string) error {
 
 	err := p.collection.Find(bson.M{"username": username}).One(&model)
 	if err != nil {
+		log.Printf("Nutzer %v konnte nicht gefunden werden", username)
 		return errors.New("Der Benutzername konnte nicht gefunden werden oder das Passwort ist falsch.")
 	}
 
 	err = bcrypt.CompareHashAndPassword(model.Password, []byte(password))
 
 	if err != nil {
+		log.Printf("Password '%v' für Nutzer %v stimmt nicht", password, username)
 		return errors.New("Der Benutzername konnte nicht gefunden werden oder das Passwort ist falsch.")
-	} else {
-		return nil
 	}
+	return nil
 
+}
+
+func (p *UserService) ChangeFooterText(lines []string) error {
+	return p.collection.Update(bson.M{"uuid": p.aktUser}, bson.M{"$set": bson.M{"planfooter": lines}})
+}
+
+func (p *UserService) GetFooterTextAktUser() ([]string, error) {
+	model := userModel{}
+	err := p.collection.Find(bson.M{"uuid": p.aktUser}).One(&model)
+	if err != nil {
+		log.Printf("User with Id %v not found: %v", p.aktUser.String(), err)
+		return []string{}, err
+	}
+	return model.Planfooter, err
 }

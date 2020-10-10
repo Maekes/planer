@@ -49,7 +49,7 @@ func ValidateJwtLoginHandler(c *gin.Context) {
 		return
 	}
 
-	err = jwtsession.SetTokenString(c, tokenString, 60*60) //60 minutes
+	err = jwtsession.SetTokenString(c, tokenString, 180*60) //3 Hours
 	if err != nil {
 		jwtsession.SetFlash(c, "Error set token string: "+err.Error())
 		//c.Redirect(http.StatusMovedPermanently, "/login")

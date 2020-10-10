@@ -1,152 +1,243 @@
 {{define "content"}}
 
 <div class="container">
-    <div class="page-header">
-        <h1 class="page-title">
-            Einstellungen
-        </h1>
-    </div>
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="media">
-                        <span class="avatar avatar-xxl mr-5"
-                            style="background-image: url(demo/faces/male/18.jpg)"></span>
-                        <div class="media-body">
-                            <h4 class="m-0">{{.user.Username}}</h4>
-                            <p class="text-muted mb-2">{{.user.Role}}</p>
-                            <p class="text-muted mb-0"><i class="fe fe-mail pt-1"></i> {{.user.Mail}}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Passwort ändern</h3>
-                </div>
-                <div class="card-alert alert alert-success mb-0">
-                    Das Passwort wurde erfolgreich geändert.
-                </div>
-                <div class="card-alert alert alert-danger mb-0" hidden>
-                    Es ist ein fehler aufgetreten. Bitte versuchen Sie es später noch einmal.
-                </div>
-                <div class="card-body">
-                    <form>
-                        <div class="form-group">
-                            <label class="form-label">Aktuelles Passwort</label>
-                            <input type="password" class="form-control" value="" name="password_old"
-                                placeholder="Passwort" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Neues Passwort</label>
-                            <input type="password" id="pass" name="password" class="form-control" placeholder="Passwort"
-                                oninput="checkPassword()">
-                            <div class="progress mt-2" style="height: 5px;">
-                                <div class="progress-bar w-1 bg-danger" id="bar" role="progressbar" aria-valuenow="1"
-                                    aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
+	<div class="page-header">
+		<h1 class="page-title">Einstellungen</h1>
+	</div>
+	<div class="row">
+		<div class="col-lg-4">
+			<div class="card">
+				<div class="card-body">
+					<div class="media">
+						<span
+							class="avatar avatar-xxl mr-5"
+							style="background-image: url(/assets/images/gesicht.jpg)"
+						></span>
+						<div class="media-body">
+							<h4 class="m-0">{{.user.Username}}</h4>
+							<p class="text-muted mb-2">{{.user.Role}}</p>
+							<p class="text-muted mb-0">
+								<i class="fe fe-mail pt-1"></i> {{.user.Mail}}
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-header">
+					<h3 class="card-title">Passwort ändern</h3>
+				</div>
+				<!--
+				<div class="card-alert alert alert-success mb-0">
+					Das Passwort wurde erfolgreich geändert.
+				</div>
+				<div class="card-alert alert alert-danger mb-0" hidden>
+					Es ist ein fehler aufgetreten. Bitte versuchen Sie es später noch
+					einmal.
+				</div>-->
+				<div class="card-body">
+					<form action="/einstellungen/changepassword" method="POST">
+						<div class="form-group">
+							<label class="form-label">Aktuelles Passwort</label>
+							<input
+								type="password"
+								class="form-control"
+								value=""
+								name="password_old"
+								placeholder="Passwort"
+							/>
+						</div>
+						<div class="form-group">
+							<label class="form-label">Neues Passwort</label>
+							<input
+								type="password"
+								id="pass"
+								name="password_new"
+								class="form-control"
+								placeholder="Passwort"
+								oninput="checkPassword()"
+							/>
+							<div class="progress mt-2" style="height: 5px">
+								<div
+									class="progress-bar w-1 bg-danger"
+									id="bar"
+									role="progressbar"
+									aria-valuenow="1"
+									aria-valuemin="0"
+									aria-valuemax="100"
+								></div>
+							</div>
+						</div>
 
-                        <div class="form-group">
-                            <input type="password" name="passwordRepeat" class="form-control"
-                                placeholder="Passwort wiederholen">
-                            <div class="form-footer">
-                                <button class="btn btn-danger btn-block">Speichern</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+						<div class="form-group">
+							<input
+								type="password"
+								name="password_new_repeat"
+								class="form-control"
+								placeholder="Passwort wiederholen"
+							/>
+							<div class="form-footer">
+								<button type="submit" class="btn btn-danger btn-block">
+									Speichern
+								</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 
+		<div class="col-lg-8">
+			<form class="card" method="POST">
+				<div class="card-body">
+					<h3 class="card-title">Profil</h3>
+					<div class="row">
+						<div class="col-5">
+							<b>Link zur aktuellen Rückmeldung:</b>
+						</div>
+						<div class="col-7">
+							<a
+								type="text"
+								disabled
+								href="/rueckmeldung?pid={{convert .user.PublicID}}"
+								>Aktuelle Rückmeldung</a
+							>
+						</div>
+					</div>
+				</div>
+				<div class="card-body">
+					<h3 class="card-title">Messdienerplan</h3>
+					<!--
+					<h4>Vorlage</h4>
+					<div class="form-group">
+						<div class="row gutters-sm">
+							<div class="col-6 col-sm-3">
+								<label class="imagecheck mb-4">
+									<input
+										name="imagecheck"
+										type="radio"
+										value="1"
+										class="imagecheck-input"
+										checked
+									/>
+									<figure class="imagecheck-figure">
+										<img
+											src="./assets/images/template_modern.jpg"
+											alt=""
+											class="imagecheck-image"
+										/>
+									</figure>
+									<figcaption class="figure-caption text-center">
+										Modern
+									</figcaption>
+								</label>
+							</div>
+							<div class="col-6 col-sm-3">
+								<label class="imagecheck mb-4">
+									<input
+										name="imagecheck"
+										type="radio"
+										value="1"
+										class="imagecheck-input"
+										disabled
+									/>
+									<figure class="imagecheck-figure">
+										<img
+											src="./assets/images/template_leer.jpg"
+											alt=""
+											class="imagecheck-image"
+										/>
+									</figure>
+									<figcaption class="figure-caption text-center">
+										weitere folgen bald...
+									</figcaption>
+								</label>
+							</div>
+						</div>
+					</div>
+					<h4>Logos</h4>
+					<div class="row gutters-sm">
+						<div class="col-6">
+							<img
+								src="./assets/images/logo_leer.jpg"
+								alt="Logo 1"
+								class="img-thumbnail mx-auto d-block mb-3"
+								style="max-height: 150px"
+							/>
+							<form
+								id="uploadLogo1Form"
+								method="POST"
+								action="/messen/importFromExcel"
+								enctype="multipart/form-data"
+							>
+								<input
+									name="file"
+									type="file"
+									id="file"
+									accept="application/vnd.ms-excel"
+									hidden
+								/>
+								<div class="text-center">
+									<label for="file" class="btn btn-green btn-sm mx-auto"
+										><i class="fe fe-upload"></i> Logo 1 hochladen</label
+									>
+									<label class="btn btn-danger btn-sm"
+										><i class="fa fa-trash"></i>
+									</label>
+								</div>
+							</form>
+						</div>
 
-        <div class="col-lg-8">
-
-            <form class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Profil</h3>
-                    <div class="row">
-                        <div class="col-5">
-                            <b>Link zur aktuellen Rückmeldung:</b>
-                        </div>
-                        <div class="col-7">
-                            <a type="text" disabled href="/rueckmeldung?pid={{convert .user.PublicID}}">Aktuelle
-                                Rückmeldung</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Messdienerplan</h3>
-                    <h4>Vorlage</h4>
-                    <div class="form-group">
-                        <div class="row gutters-sm">
-                            <div class="col-6 col-sm-3">
-                                <label class="imagecheck mb-4">
-                                    <input name="imagecheck" type="radio" value="1" class="imagecheck-input" checked />
-                                    <figure class="imagecheck-figure">
-                                        <img src="./assets/images/template_modern.jpg" alt="" class="imagecheck-image">
-                                    </figure>
-                                    <figcaption class="figure-caption text-center">Modern</figcaption>
-                                </label>
-                            </div>
-                            <div class="col-6 col-sm-3">
-                                <label class="imagecheck mb-4">
-                                    <input name="imagecheck" type="radio" value="1" class="imagecheck-input" disabled />
-                                    <figure class="imagecheck-figure">
-                                        <img src="./assets/images/template_leer.jpg" alt="" class="imagecheck-image">
-                                    </figure>
-                                    <figcaption class="figure-caption text-center">weitere folgen bald...</figcaption>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <h4>Logos</h4>
-                    <div class="row gutters-sm">
-                        <div class="col-6">
-                            <img src="./assets/images/logo_leer.jpg" alt="Logo 1"
-                                class="img-thumbnail mx-auto d-block mb-3" style="max-height: 150px;">
-                            <form id="uploadLogo1Form" method="POST" action="/messen/importFromExcel"
-                                enctype="multipart/form-data">
-                                <input name="file" type="file" id="file" accept="application/vnd.ms-excel" hidden>
-                                <div class=" text-center">
-                                    <label for="file" class="btn btn-green btn-sm mx-auto"><i class="fe fe-upload"></i>
-                                        Logo 1 hochladen</label>
-                                    <label class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> </label>
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="col-6">
-                            <img src="./assets/images/logo_leer.jpg" alt="Logo 2"
-                                class="img-thumbnail mx-auto d-block mb-3" style="max-height: 150px;">
-                            <form id="uploadLogo2Form" method="POST" action="/messen/importFromExcel"
-                                enctype="multipart/form-data">
-                                <input name="file" type="file" id="file" accept="application/vnd.ms-excel" hidden>
-                                <div class=" text-center">
-                                    <label for="file" class="btn btn-green btn-sm mx-auto"><i class="fe fe-upload"></i>
-                                        Logo 2 hochladen</label>
-                                    <label  class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> </label>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-                    <h4 class="mt-3">Fußzeile</h4>
-                    <textarea class="form-control" name="example-textarea-input" rows="2" placeholder="Inhalt...">
-Online: www.minis-quirin.de | Mail: leiterrunde@minis-quirin.de | WhatsApp: +49 1590 8120 575
-Gruppenstunden: Freitag 17:00 - 18:00 Uhr
-                    </textarea>
-                </div>
-                <div class="card-footer text-right">
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
-                </div>
-            </form>
-        </div>
-
-
-    </div>
+						<div class="col-6">
+							<img
+								src="./assets/images/logo_leer.jpg"
+								alt="Logo 2"
+								class="img-thumbnail mx-auto d-block mb-3"
+								style="max-height: 150px"
+							/>
+							<form
+								id="uploadLogo2Form"
+								method="POST"
+								action="/messen/importFromExcel"
+								enctype="multipart/form-data"
+							>
+								<input
+									name="file"
+									type="file"
+									id="file"
+									accept="application/vnd.ms-excel"
+									hidden
+								/>
+								<div class="text-center">
+									<label for="file" class="btn btn-green btn-sm mx-auto"
+										><i class="fe fe-upload"></i> Logo 2 hochladen</label
+									>
+									<label class="btn btn-danger btn-sm"
+										><i class="fa fa-trash"></i>
+									</label>
+								</div>
+							</form>
+						</div>
+					</div>
+					-->
+					<h4 class="mt-3">Fußzeile</h4>
+					<textarea
+						class="form-control"
+						name="footerText"
+						rows="2"
+						placeholder="Inhalt..."
+					>
+{{range $line := .user.Planfooter}}{{$line}}{{end}}</textarea
+					>
+				</div>
+				<div class="card-footer text-right">
+					<button type="submit" class="btn btn-success">
+						Änderungen Speichern
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>
-
 
 {{end}}

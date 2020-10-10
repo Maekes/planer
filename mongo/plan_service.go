@@ -42,6 +42,11 @@ func (p *PlanService) GetPlanByUUID(UId uuid.UUID) (*PlanModel, error) {
 	return &results, err
 }
 
+func (p *PlanService) UpdateHinweis(pid uuid.UUID, hinweis string) error {
+	err := p.collection.Update(bson.M{"useruuid": p.aktUser, "uuid": pid}, bson.M{"$set": bson.M{"rueckmeldunghinweis": hinweis}})
+	return err
+}
+
 func (p *PlanService) GetNewestPlanFromUser(UId uuid.UUID) (*PlanModel, error) {
 	var result PlanModel
 	err := p.collection.Find(bson.M{"useruuid": UId}).Sort("-erstellt").One(&result)

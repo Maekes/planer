@@ -81,6 +81,7 @@ func main() {
 		auth.POST("/messen/updateRelevantState", handler.MessenUpdateStateHandler)
 		auth.POST("/messen/importFromExcel", handler.AddMessenFromExcelHandler)
 
+		auth.POST("/messdienerplan/changehinweis", handler.MessdienerplanChangeHinweisHandler)
 		auth.POST("/messdienerplan/create", handler.MessdienerplanCreateHandler)
 
 		auth.GET("/minis/delete/:id", handler.MinisDeleteHandler)
@@ -88,6 +89,8 @@ func main() {
 		auth.POST("/minis/importFromExcel", handler.AddMiniFromExcelHandler)
 
 		auth.GET("/einstellungen", handler.EinstellungenHandler)
+		auth.POST("/einstellungen", handler.EinstellungenChangeHandler)
+		auth.POST("/einstellungen/changepassword", handler.PasswordChangeHandler)
 
 		admin := auth.Group("adminArea")
 		admin.Use(handler.AdminMiddleware)

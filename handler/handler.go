@@ -350,13 +350,15 @@ func MessdienerplanHandler(c *gin.Context) {
 		"username":    userService.GetUsernameByID(miniService.AktUser),
 		"role":        userService.GetRoleByID(miniService.AktUser),
 	})
+
 }
 func MessdienerplanCreateHandler(c *gin.Context) {
 
 	l, err := time.LoadLocation("Europe/Berlin")
 	daterange := strings.Split(c.PostForm("daterange"), " - ")
-	if len(daterange) != 2 {
-		Error404Handler(c)
+	if len(daterange) != 2 || c.PostForm("title") == "" {
+		c.Redirect(http.StatusFound, "/messdienerplan")
+		return
 	}
 	from, err := time.ParseInLocation("02.01.2006", daterange[0], l)
 	to, err := time.ParseInLocation("02.01.2006", daterange[1], l)
@@ -367,7 +369,7 @@ func MessdienerplanCreateHandler(c *gin.Context) {
 
 	uid := uuid.NewV4()
 
-	planService.Create(&mongo.PlanModel{
+	err = planService.Create(&mongo.PlanModel{
 		UUID:                uid,
 		Erstellt:            time.Now(),
 		Von:                 fromDate,
@@ -380,9 +382,8 @@ func MessdienerplanCreateHandler(c *gin.Context) {
 		log.Println(err)
 	}
 
-	c.Redirect(http.StatusFound, "/zuordnen/"+uid.String())
+	c.Redirect(http.StatusFound, "/messdienerplan")
 }
-
 func MessdienerplanPdfHandler(c *gin.Context) {
 	uid, err := uuid.FromString(c.Param("id"))
 	if err != nil {
@@ -394,6 +395,11 @@ func MessdienerplanPdfHandler(c *gin.Context) {
 	}
 	messen, _ := messeService.GetAllMessenThatAreRelevantFromToDate(p.Von, p.Bis)
 	messe := *messen
+
+	footer, err := userService.GetFooterTextAktUser()
+	if err != nil {
+		footer = []string{}
+	}
 
 	marginCell := 0.2 // margin of top/bottom of cell
 	pdf := gofpdf.New("P", "mm", "A4", "")
@@ -412,8 +418,9 @@ func MessdienerplanPdfHandler(c *gin.Context) {
 		pdf.Text(12, 255, " Messdienerplan   "+utf(p.Titel))
 		pdf.TransformEnd()
 		pdf.SetFont("Helvetica", "", 10)
-		pdf.Text(23, 286, "Online: www.minis-quirin.de | Mail: leiterrunde@minis-quirin.de | WhatsApp: +49 1590 8120 575")
-		pdf.Text(23, 291, "Gruppenstunden: Freitag 17:00 - 18:00 Uhr")
+		for i, line := range footer {
+			pdf.Text(23, float64(286+(i*5)), line)
+		}
 		pdf.Image("logo.png", 188, 280, 14, 14, false, "", 0, "")
 
 	}, true)
@@ -615,7 +622,13 @@ func EinstellungenHandler(c *gin.Context) {
 }
 
 func MessenHandler(c *gin.Context) {
-	data, _ := messeService.GetAllMessen() //GetAllMessenFromDate(time.Now().AddDate(0, 0, -7))
+	var data *[]mongo.MesseModel
+	if c.Query("show") == "all" {
+		data, _ = messeService.GetAllMessen()
+	} else {
+		data, _ = messeService.GetAllMessenFromDate(time.Now().AddDate(0, 0, -7)) //Messen aktuell und der letzten 7 Tage
+	}
+
 	c.HTML(http.StatusOK, "messen", gin.H{
 		"title":    "Messen",
 		"payload":  data,
@@ -665,6 +678,20 @@ func MessdienerplanDeleteHandler(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/messdienerplan")
 }
 
+func MessdienerplanChangeHinweisHandler(c *gin.Context) {
+	idToSreach, err := uuid.FromString(c.PostForm("uuid"))
+	if err != nil {
+		c.Redirect(http.StatusFound, "/messdienerplan")
+		return
+	}
+
+	planService.UpdateHinweis(idToSreach, c.PostForm("hinweis"))
+	if err != nil {
+		log.Println(err)
+	}
+	c.Redirect(http.StatusFound, "/messdienerplan")
+}
+
 func MessenDeleteHandler(c *gin.Context) {
 	idToSreach, err := uuid.FromString(c.Param("id"))
 	if err != nil {
@@ -698,6 +725,30 @@ func UserResetPassword(c *gin.Context) {
 	password := "123456"
 	userService.AdminChangeUserPasswordById(idToSreach, password)
 	c.Redirect(http.StatusFound, "/adminArea")
+}
+
+func EinstellungenChangeHandler(c *gin.Context) {
+	footerLines := c.PostForm("footerText")
+	lines := strings.Split(footerLines, "\n")
+	userService.ChangeFooterText(lines)
+	c.Redirect(http.StatusFound, "/einstellungen")
+}
+
+func PasswordChangeHandler(c *gin.Context) {
+
+	passwordOld := c.PostForm("password_old")
+	passwordNew := c.PostForm("password_new")
+	passwordNewRepeat := c.PostForm("password_new_repeat")
+
+	if passwordNew != passwordNewRepeat {
+		log.Println("Passwords not match")
+		c.Redirect(http.StatusFound, "/einstellungen")
+	}
+	err := userService.ChangeUserPasswordAktUser(passwordOld, passwordNew)
+	if err != nil {
+		log.Println(err)
+	}
+	c.Redirect(http.StatusFound, "/einstellungen")
 }
 
 func AddMessenHandler(c *gin.Context) {
@@ -845,7 +896,7 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 	defer func(c *gin.Context) {
 		if rec := recover(); rec != nil {
 			c.Redirect(http.StatusFound, "/messen")
-
+			return
 		}
 	}(c)
 
@@ -870,18 +921,22 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 					break
 				}
 				fmt.Println(row.Col(1))
-				d, err := time.ParseInLocation("2006-01-02T15:04:05Z", row.Col(1), l)
-				u, err := time.ParseInLocation("15:04", row.Col(2), l)
+
+				//u, err := time.ParseInLocation("15:04", row.Col(2), l)
 				t, err := strconv.ParseFloat(row.Col(2), 32)
-				u = timeFromExcelTime(t, true)
+				u := timeFromExcelTime(t, true)
 				s, err := time.ParseDuration("1s")
 				u = u.Add(s) //Sekunde die Floating Point Fehler ausgleicht
-				d = d.Add(time.Hour*time.Duration(u.Hour()) +
-					time.Minute*time.Duration(u.Minute()) +
-					0)
+				timeString := strings.ReplaceAll(row.Col(1), "00:00:00", fmt.Sprintf("%02d:%02d:00", u.Hour(), u.Minute()))
+				fmt.Println(timeString)
+
+				d, err := time.ParseInLocation("2006-01-02T15:04:05Z", timeString, l)
+				//d = d.Add(time.Hour*time.Duration(u.Hour()) +
+				//	time.Minute*time.Duration(u.Minute()) +
+				//	0)
 
 				if err != nil {
-					log.Println("Could not Parse Time")
+					log.Println("Could not Parse Time: ", err)
 				}
 
 				uid := uuid.NewV4()

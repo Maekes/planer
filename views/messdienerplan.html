@@ -1,99 +1,152 @@
 {{define "content"}}
 <div class="container">
-  <div class="page-header">
-    <h1 class="page-title">
-      Meine Messdienerpläne
-    </h1>
-  </div>
-  <div class="row">
-    <div class="col-lg-4">
-      <div class="card">
-        <div class="card-status  card-status bg-green"></div>
-        <div class="card-header">
-          <h3 class="card-title">Neuen Plan anlegen</h3>
-        </div>
-        <div class="card-body">
-          <form action="/messdienerplan/create" method="POST">
-            <div class="form-group">
-              <label class="form-label">Titel</label>
-              <input class="form-control" name="title" placeholder="Januar / Februar" />
-            </div>
+	<div class="page-header">
+		<h1 class="page-title">Meine Messdienerpläne</h1>
+	</div>
+	<div class="row">
+		<div class="col-lg-4">
+			<div class="card">
+				<div class="card-status card-status bg-green"></div>
+				<div class="card-header">
+					<h3 class="card-title">Neuen Plan anlegen</h3>
+				</div>
+				<div class="card-body">
+					<form action="/messdienerplan/create" method="POST">
+						<div class="form-group">
+							<label class="form-label">Titel</label>
+							<input
+								class="form-control"
+								name="title"
+								placeholder="Januar / Februar"
+							/>
+						</div>
 
-            <div class="form-group">
-              <label class="form-label">Zeitspanne</label>
-              <input type="text" name="daterange" autocomplete="off" id="datepicker" class="form-control datepicker-here"
-                placeholder="00.00.0000 - 00.00.0000"  data-language="de" data-position="bottom left" readonly  />
-            </div>
+						<div class="form-group">
+							<label class="form-label">Zeitspanne</label>
+							<input
+								type="text"
+								name="daterange"
+								autocomplete="off"
+								id="datepicker"
+								class="form-control datepicker-here"
+								placeholder="00.00.0000 - 00.00.0000"
+								data-language="de"
+								data-position="bottom left"
+								readonly
+							/>
+						</div>
 
-           
-            <div class="form-group">
-              <label class="form-label">Hinweis für Rückmeldung</label>
-              <input class="form-control" name="hinweis" value="Bitte bis zum  eintragen wann ihr dienen könnt." />
-            </div>
+						<div class="form-group">
+							<label class="form-label">Hinweis für die Rückmeldung</label>
+							<input
+								class="form-control"
+								name="hinweis"
+								value="Bitte bis zum  eintragen wann ihr dienen könnt."
+							/>
+						</div>
 
+						<script>
 
+							// Initialization
+							$("#datepicker").datepicker({
+							  'maxDate': new Date({{.maxDate}}),
+							  'range': true,
+							  'multipleDatesSeparator': ' - ',
+							  'autoClose': true
+							});
+							// Access instance of plugin
+							//var datepicker = $("#datepicker").data('datepicker')
+						</script>
 
-            <script>
-            
-              // Initialization
-              $("#datepicker").datepicker({
-                'maxDate': new Date({{.maxDate}}),
-                'range': true,
-                'multipleDatesSeparator': ' - ',
-                'autoClose': true
-              });
-              // Access instance of plugin
-              //var datepicker = $("#datepicker").data('datepicker')
-             
-             
-            </script>
+						<div class="form-footer">
+							<button submit class="btn btn-success btn-block">
+								<i class="fe fe-chevrons-right"></i> Messdienerplan anlegen
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 
-            <div class="form-footer">
-              <button submit class="btn btn-success btn-block"> <i class="fe fe-chevrons-right"></i> Anlegen &
-                Messdiener eintragen</button>
-            </div>
-          </form>
+		<div class="col-lg-8">
+			{{range $index, $value := .planPayload}}
+			<div class="card card-collapsed">
+				<div class="card-status card-status-left bg-red"></div>
+				<div class="card-header">
+					<div class="text-wrap">
+						<h4 class="mb-1">{{.Titel}}</h4>
+						<p class="leading-tight mb-0 text-muted">
+							<i class="fe fe-calendar"></i> {{getDate .Von}} - {{getDate .Bis}}
+						</p>
+					</div>
 
-        </div>
-      </div>
-    </div>
+					<div class="card-options">
+						<a
+							href="/messdienerplan/pdf/{{.UUID}}"
+							class="btn btn-outline-success btn-sm disabled"
+							aria-disabled="true"
+							><i class="fa fa-table"></i> Excel (TBA)</a
+						>
+						<a
+							href="/messdienerplan/pdf/{{.UUID}}"
+							class="btn btn-outline-danger btn-sm ml-2"
+							><i class="fa fa-file-pdf-o"></i> PDF</a
+						>
+						<a
+							href="/zuordnen/{{.UUID}}?sortBy=name"
+							class="btn btn-outline-secondary btn-sm ml-2"
+							><i class="fe fe-edit"></i> Messdiener eintragen</a
+						>
+						<a
+							href="#"
+							class="card-options-collapse"
+							data-toggle="card-collapse"
+							><i class="fe fe-chevron-up"></i
+						></a>
+					</div>
+				</div>
+				<div class="card-body">
+					<p class="leading-tight mb-3">
+						<i class="fe fe-calendar"></i> Erstellt am: {{getDate .Erstellt}}
+						<i class="fe fe-link ml-5"></i>
+						<a href="/rueckmeldung?id={{.UUID}}">Zur Rückmeldung</a>
+					</p>
 
-    <div class="col-lg-8">
-      {{range $index, $value := .planPayload}}
-      <div class="card card-collapsed">
-        <div class="card-status  card-status-left bg-red"></div>
-        <div class="card-header">
-          <div class="text-wrap">
-            <h4 class="mb-1">{{.Titel}}</h4>
-            <p class="leading-tight mb-0 text-muted"><i class="fe fe-calendar"></i> {{getDate .Von}} - {{getDate .Bis}}
-            </p>
-          </div>
+					<form
+						class="form-group"
+						action="/messdienerplan/changehinweis"
+						method="POST"
+					>
+						<label class="form-label">Hinweis für die Rückmeldung</label>
+						<div class="input-group">
+							<input type="text" hidden name="uuid" value="{{.UUID}}" />
+							<input
+								type="text"
+								name="hinweis"
+								class="form-control"
+								value="{{.RueckmeldungHinweis}}"
+							/>
+							<span class="input-group-append">
+								<button class="btn btn-success" type="submit">
+									Aktualisieren
+								</button>
+							</span>
+						</div>
+					</form>
+					<pre class="leading-tight">{{getMessen .Von .Bis}}</pre>
+					<p class="leading-tight text-right">
+						<a
+							href="/messdienerplan/delete/{{ .UUID}}"
+							class="btn btn-danger btn-sm"
+							><i class="fa fa-trash"></i> Plan Löschen</a
+						>
+					</p>
+				</div>
+			</div>
 
-          <div class="card-options">
-              <a href="/messdienerplan/pdf/{{.UUID}}" class="btn btn-outline-success btn-sm"><i
-                class="fa fa-table"></i> Excel</a>
-            <a href="/messdienerplan/pdf/{{.UUID}}" class="btn btn-outline-danger btn-sm ml-2"><i
-                class="fa fa-file-pdf-o"></i> PDF</a>
-            <a href="/zuordnen/{{.UUID}}?sortBy=name" class="btn btn-outline-secondary btn-sm ml-2"><i class="fe fe-edit"></i>
-              Messdiener eintragen</a>
-            <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
-          </div>
-        </div>
-        <div class="card-body">
-          <p class="leading-tight mb-3"><i class="fe fe-calendar"></i> Erstellt am: {{getDate .Erstellt}} <i
-              class="fe fe-link ml-5"></i> <a href="/rueckmeldung?id={{.UUID}}">Zur Rückmeldung</a></p>
-          <pre class="leading-tight">{{getMessen .Von .Bis}}</pre>
-          <p class="leading-tight text-right"><a href="/messdienerplan/delete/{{ .UUID}}"
-              class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Plan
-              Löschen</a></p>
-        </div>
-      </div>
-
-
-      {{end}}
-    </div>
-
-  </div>
+			{{end}}
+		</div>
+	</div>
 </div>
 
 {{end}}
