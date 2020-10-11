@@ -68,6 +68,7 @@ func main() {
 		auth.GET("/zuordnen/:id", handler.ZuordnenHandler)
 		auth.GET("/messdienerplan", handler.MessdienerplanHandler)
 		auth.GET("/messdienerplan/pdf/:id", handler.MessdienerplanPdfHandler)
+		auth.GET("/messdienerplan/xlsx/:id", handler.MessdienerplanXlsxHandler)
 		auth.GET("/messdienerplan/delete/:id", handler.MessdienerplanDeleteHandler)
 
 		auth.POST("/zuordnen/draged", handler.ZuordnenDragedHandler)

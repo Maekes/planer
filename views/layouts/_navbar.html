@@ -15,11 +15,11 @@
 
       <div class="col-lg order-lg-first">
         <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
-
+<!--
           <li class="nav-item">
             <a href="/" class="nav-link"><i class="fe fe-home"></i> Home</a>
           </li>
-          <!--
+        
             <li class="nav-item">
               <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-calendar"></i> Messen</a>
               <div class="dropdown-menu dropdown-menu-arrow">
@@ -29,10 +29,10 @@
             </li>
       -->
           <li class="nav-item">
-            <a href="/messen" class="nav-link"><i class="fe fe-calendar"></i>Messen</a>
+            <a href="/messen" class="nav-link {{if eq .title "Messen" }} active {{end}}"><i class="fe fe-calendar"></i>Messen</a>
           </li>
           <li class="nav-item">
-            <a href="/minis" class="nav-link"><i class="fe fe-users"></i> Messdiener</a>
+            <a href="/minis" class="nav-link {{if eq .title "Messdienerliste" }} active {{end}}"><i class="fe fe-users"></i> Messdiener</a>
           </li>
 
           <li class="nav-item">
@@ -43,7 +43,7 @@
           </li>
           {{if eq .role "Administrator"}}
           <li class="nav-item">
-            <a href="/adminArea" class="nav-link"><i class="fe fe-settings"></i> Administration</a>
+            <a href="/adminArea" class="nav-link {{if eq .title "Administration" }} active {{end}}"><i class="fe fe-settings"></i> Administration</a>
           </li>
           {{end}}
 

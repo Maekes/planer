@@ -7,10 +7,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/Maekes/planer/mongo"
 	"github.com/Maekes/planer/mongo/role"
 	"gopkg.in/gomail.v2"
@@ -384,14 +386,70 @@ func MessdienerplanCreateHandler(c *gin.Context) {
 
 	c.Redirect(http.StatusFound, "/messdienerplan")
 }
-func MessdienerplanPdfHandler(c *gin.Context) {
+
+func MessdienerplanXlsxHandler(c *gin.Context) {
 	uid, err := uuid.FromString(c.Param("id"))
 	if err != nil {
-		//TODO
+		c.Redirect(http.StatusFound, "/messdienerplan")
 	}
 	p, err := planService.GetPlanByUUID(uid)
 	if err != nil {
-		//TODO
+		c.Redirect(http.StatusFound, "/messdienerplan")
+	}
+	messen, _ := messeService.GetAllMessenThatAreRelevantFromToDate(p.Von, p.Bis)
+	messe := *messen
+
+	rows := [][]string{}
+	rows = append(rows, []string{"Datum", "Zeit", "Messe", "Messdiener"})
+
+	for _, m := range messe {
+		messdiener := ""
+		for _, id := range m.MinisForPlan {
+			minis, _ := miniService.GetMiniByUUID(id)
+			messdiener = messdiener + minis.Vorname + " " + minis.Nachname + ", "
+		}
+
+		messdiener = strings.TrimSuffix(messdiener, ", ")
+		if messdiener == "" {
+			messdiener = "freiwillig"
+		}
+
+		g := m.Gottesdienst + "\n" + m.InfoForPlan
+		rows = append(rows, []string{toGermanShort(m.Datum.Format("Mon")) + " " + m.Datum.Format("02.01."), m.Datum.Format("15:04"), g, messdiener})
+	}
+
+	f := excelize.NewFile()
+	// Create a new sheet.
+	sheetname := fmt.Sprintf("%v - %v", p.Von.Format("02.01."), p.Bis.Format("02.01."))
+	index := f.NewSheet(sheetname)
+
+	for rn, row := range rows {
+		for cn, cel := range row {
+			celindex, _ := excelize.CoordinatesToCellName(cn+1, rn+1)
+			f.SetCellValue(sheetname, celindex, cel)
+		}
+	}
+
+	// Set active sheet of the workbook.
+	f.SetActiveSheet(index)
+
+	c.Header("Content-Disposition", "attachment; filename=Messdienerplan "+p.Titel+".xlsx")
+	c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	//c.Header("Content-Length", r.Header.Get("Content-Length"))
+
+	err = f.Write(c.Writer)
+	if err != nil {
+		log.Println(err)
+	}
+}
+func MessdienerplanPdfHandler(c *gin.Context) {
+	uid, err := uuid.FromString(c.Param("id"))
+	if err != nil {
+		c.Redirect(http.StatusFound, "/messdienerplan")
+	}
+	p, err := planService.GetPlanByUUID(uid)
+	if err != nil {
+		c.Redirect(http.StatusFound, "/messdienerplan")
 	}
 	messen, _ := messeService.GetAllMessenThatAreRelevantFromToDate(p.Von, p.Bis)
 	messe := *messen
@@ -900,61 +958,121 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 		}
 	}(c)
 
-	file, _, err := c.Request.FormFile("file")
+	file, header, err := c.Request.FormFile("file")
 	if err != nil {
 		c.Redirect(http.StatusFound, "/messen")
 		return
 	}
 
-	//
+	// Detect Fietype (not the best way, but it woks more or less)
+	// Better Way with content type, but not shure if it is same for every excel file
+	// Content-Type:[application/octet-stream]  => .xls
+	// Content-Type:[application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]  => .xlsx
+
+	fmt.Println(header.Filename)
+	fmt.Println(header.Header)
+
+	filename := strings.Split(header.Filename, ".")
+	filetype := filename[len(filename)-1]
+
 	l, err := time.LoadLocation("Europe/Berlin")
-	if xlFile, err := xls.OpenReader(file, "utf-8"); err == nil {
-		if err != nil {
-			c.Redirect(http.StatusFound, "/messen")
-			return
+
+	switch filetype {
+	case "xls":
+		if xlFile, err := xls.OpenReader(file, "utf-8"); err == nil {
+			if err != nil {
+				c.Redirect(http.StatusFound, "/messen")
+				return
+			}
+			for i := 0; i < xlFile.NumSheets(); i++ {
+				sheet := xlFile.GetSheet(i)
+				for j := 1; j <= int(sheet.MaxRow); j++ {
+					row := sheet.Row(j)
+					if row.Col(0) == "" {
+						break
+					}
+					fmt.Println(row.Col(1))
+
+					//u, err := time.ParseInLocation("15:04", row.Col(2), l)
+					t, err := strconv.ParseFloat(row.Col(2), 32)
+					if err != nil {
+						log.Println("Could not Parse Time: ", err)
+						c.Redirect(http.StatusFound, "/messen")
+						return
+					}
+
+					s, err := time.ParseDuration("1s")
+					u := timeFromExcelTime(t, true).Add(s) //Sekunde die Floating Point Fehler ausgleicht
+					timeString := strings.ReplaceAll(row.Col(1), "00:00:00", fmt.Sprintf("%02d:%02d:00", u.Hour(), u.Minute()))
+					d, err := time.ParseInLocation("2006-01-02T15:04:05Z", timeString, l)
+
+					if err != nil {
+						log.Println("Could not Parse Date: ", err)
+						c.Redirect(http.StatusFound, "/messen")
+						return
+					}
+
+					uid := uuid.NewV4()
+
+					m := mongo.MesseModel{
+						UUID:            uid,
+						Datum:           d,
+						Gottesdienst:    row.Col(3),
+						LiturgischerTag: row.Col(5),
+						Bemerkung:       row.Col(6),
+						IsRelevant:      checkIfRelevant(row.Col(3), row.Col(6), d.Format("Mon"), d.Format("15:04")),
+					}
+
+					messeService.Create(&m)
+				}
+			}
 		}
-		for i := 0; i < xlFile.NumSheets(); i++ {
-			sheet := xlFile.GetSheet(i)
-			for j := 1; j <= int(sheet.MaxRow); j++ { //int(sheet.MaxRow)
-				row := sheet.Row(j)
-				if row.Col(0) == "" {
+	case "xlsx":
+		if xlFile, err := excelize.OpenReader(file); err == nil {
+			sheetName := xlFile.GetSheetName(0)
+			rows, err := xlFile.GetRows(sheetName)
+			if err != nil {
+				c.Redirect(http.StatusFound, "/messen")
+				return
+			}
+			for _, row := range rows {
+				if row[0] == "" {
 					break
 				}
-				fmt.Println(row.Col(1))
 
-				//u, err := time.ParseInLocation("15:04", row.Col(2), l)
-				t, err := strconv.ParseFloat(row.Col(2), 32)
-				u := timeFromExcelTime(t, true)
 				s, err := time.ParseDuration("1s")
-				u = u.Add(s) //Sekunde die Floating Point Fehler ausgleicht
-				timeString := strings.ReplaceAll(row.Col(1), "00:00:00", fmt.Sprintf("%02d:%02d:00", u.Hour(), u.Minute()))
-				fmt.Println(timeString)
-
-				d, err := time.ParseInLocation("2006-01-02T15:04:05Z", timeString, l)
-				//d = d.Add(time.Hour*time.Duration(u.Hour()) +
-				//	time.Minute*time.Duration(u.Minute()) +
-				//	0)
+				//u := timeFromExcelTime(t, true).Add(s) //Sekunde die Floating Point Fehler ausgleicht
+				d, err := strconv.ParseFloat(row[1], 64)
+				t, err := strconv.ParseFloat(row[2], 64)
+				date, err := excelize.ExcelDateToTime(d+t, false)
+				date, err = time.ParseInLocation("2006-01-02T15:04:05Z", date.Format("2006-01-02T15:04:05Z"), l)
+				//timeString := strings.ReplaceAll(row[1], "00:00:00", fmt.Sprintf("%02d:%02d:00", u.Hour(), u.Minute()))
+				//d, err := time.ParseInLocation("2006-01-02T15:04:05Z", timeString, l)
 
 				if err != nil {
-					log.Println("Could not Parse Time: ", err)
+					log.Println("Could not Parse Date: ", err)
+					c.Redirect(http.StatusFound, "/messen")
+					return
 				}
 
 				uid := uuid.NewV4()
 
 				m := mongo.MesseModel{
 					UUID:            uid,
-					Datum:           d,
-					Gottesdienst:    row.Col(3),
-					LiturgischerTag: row.Col(5),
-					Bemerkung:       row.Col(6),
-					IsRelevant:      checkIfRelevant(row.Col(3), row.Col(6), d.Format("Mon"), d.Format("15:04")),
+					Datum:           date.Add(s),
+					Gottesdienst:    row[3],
+					LiturgischerTag: row[5],
+					Bemerkung:       row[6],
+					IsRelevant:      checkIfRelevant(row[3], row[6], date.Format("Mon"), date.Format("15:04")),
 				}
 
 				messeService.Create(&m)
 			}
+		} else {
+			c.Redirect(http.StatusFound, "/messen")
+			return
 		}
 	}
-
 	c.Redirect(http.StatusFound, "/messen")
 }
 
@@ -992,6 +1110,10 @@ func Error404Handler(c *gin.Context) {
 // g = Gottesdienst, b = Bemerkung, t = Tag, u = Uhrzeit
 func checkIfRelevant(g string, b string, t string, u string) bool {
 	if strings.Contains(b, "panisch") {
+		return false
+	}
+
+	if strings.Contains(g, "Rosenkranz") {
 		return false
 	}
 
@@ -1043,4 +1165,21 @@ func checkIfRelevant(g string, b string, t string, u string) bool {
 	}
 
 	return true
+}
+
+func GetFileContentType(out *os.File) (string, error) {
+
+	// Only the first 512 bytes are used to sniff the content type.
+	buffer := make([]byte, 512)
+
+	_, err := out.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	// Use the net/http package's handy DectectContentType function. Always returns a valid
+	// content-type by returning "application/octet-stream" if no others seemed to match.
+	contentType := http.DetectContentType(buffer)
+
+	return contentType, nil
 }
