@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"strings"
@@ -89,7 +88,6 @@ var C = goview.Config{
 			messen, err := messeService.GetAllMessenThatAreRelevantFromToDate(f, t)
 			if err != nil {
 				//TODO
-				fmt.Print("error in getMessen")
 			}
 			for _, messe := range *messen {
 				output = append(output, toGermanShort(messe.Datum.Format("Mon")))

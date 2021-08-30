@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -37,6 +38,7 @@ var planService *mongo.PlanService
 var session *mongo.Session
 
 var MailPW string
+var KaplanSecret string
 
 func InitHandler(url string) {
 	session, err := mongo.NewSession(url)
@@ -44,18 +46,13 @@ func InitHandler(url string) {
 		log.Fatalf("Unable to connect to mongo: %s", err)
 	}
 
-	//session.DropDatabase(dbName)
-
 	userService = mongo.NewUserService(session.Copy(), dbName, "user")
 	messeService = mongo.NewMesseService(session.Copy(), dbName, "messen")
 	miniService = mongo.NewMiniService(session.Copy(), dbName, "minis")
 	planService = mongo.NewPlanService(session.Copy(), dbName, "plan")
 
 	if !userService.ExistsAdmin() {
-		err := userService.CreateNewUser("admin", "admin@planer.minis-quirin.de", "admin", role.Admin)
-		if err != nil {
-			//TODO
-		}
+		userService.CreateNewUser("admin", "admin@planer.minis-quirin.de", "admin", role.Admin)
 		log.Println("#### Created new admin u:admin/p:admin ####")
 	}
 }
@@ -949,6 +946,65 @@ func AddMiniFromExcelHandler(c *gin.Context) {
 	}
 	c.Redirect(http.StatusFound, "/minis")
 }
+
+func AddMessenFromKaplanHandler(c *gin.Context) {
+	defer func(c *gin.Context) {
+		if rec := recover(); rec != nil {
+			c.Redirect(http.StatusFound, "/messen")
+			return
+		}
+	}(c)
+
+	type KaplanData struct {
+		Datum        string `json:"Datum"`
+		Uhrzeit      string `json:"Uhrzeit"`
+		Bis          string `json:"bis"`
+		Gottesdienst string `json:"Gottesdienst"`
+		Zusatz       string `json:"Zusatz"`
+		Ort          string `json:"Ort"`
+		ID           string `json:"ID"`
+		FaelltAus    bool   `json:"FaelltAus"`
+	}
+
+	var messen []KaplanData
+
+	url := "https://flex9.kaplanhosting.de:8443/get.asp?ref=%s&mode=T1&type=json&KG=%s&Days=%s"
+
+	kirchenID := c.PostForm("kirchenID")
+	anzahlTage := c.PostForm("anzahlTage")
+
+	request, err := http.Get(fmt.Sprintf(url, KaplanSecret, kirchenID, anzahlTage))
+	if err != nil {
+		log.Println(err)
+		c.Redirect(http.StatusFound, "/messen")
+		return
+	}
+	json.NewDecoder(request.Body).Decode(&messen)
+
+	for _, messe := range messen {
+		uid := uuid.NewV4()
+		location, _ := time.LoadLocation("Europe/Berlin")
+		date, _ := time.ParseInLocation("1/2/2006 15:04", fmt.Sprintf("%s %s", messe.Datum, messe.Uhrzeit), location)
+
+		if messe.Gottesdienst == "Sonntagvorabendmesse" {
+			messe.Gottesdienst = "Vorabendmesse"
+		}
+
+		m := mongo.MesseModel{
+			UUID:            uid,
+			KaplanID:        messe.ID,
+			Datum:           date,
+			Gottesdienst:    messe.Gottesdienst,
+			LiturgischerTag: "",
+			Bemerkung:       messe.Zusatz,
+			IsRelevant:      checkIfRelevant(messe.Gottesdienst, messe.Zusatz, date.Format("Mon"), date.Format("15:04"), messe.FaelltAus),
+		}
+		messeService.CreateFromKaplan(&m)
+	}
+	c.Redirect(http.StatusFound, "/messen")
+
+}
+
 func AddMessenFromExcelHandler(c *gin.Context) {
 
 	defer func(c *gin.Context) {
@@ -969,9 +1025,6 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 	// Content-Type:[application/octet-stream]  => .xls
 	// Content-Type:[application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]  => .xlsx
 
-	fmt.Println(header.Filename)
-	fmt.Println(header.Header)
-
 	filename := strings.Split(header.Filename, ".")
 	filetype := filename[len(filename)-1]
 
@@ -991,7 +1044,6 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 					if row.Col(0) == "" {
 						break
 					}
-					fmt.Println(row.Col(1))
 
 					//u, err := time.ParseInLocation("15:04", row.Col(2), l)
 					t, err := strconv.ParseFloat(row.Col(2), 32)
@@ -1020,7 +1072,7 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 						Gottesdienst:    row.Col(3),
 						LiturgischerTag: row.Col(5),
 						Bemerkung:       row.Col(6),
-						IsRelevant:      checkIfRelevant(row.Col(3), row.Col(6), d.Format("Mon"), d.Format("15:04")),
+						IsRelevant:      checkIfRelevant(row.Col(3), row.Col(6), d.Format("Mon"), d.Format("15:04"), false),
 					}
 
 					messeService.Create(&m)
@@ -1063,7 +1115,7 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 					Gottesdienst:    row[3],
 					LiturgischerTag: row[5],
 					Bemerkung:       row[6],
-					IsRelevant:      checkIfRelevant(row[3], row[6], date.Format("Mon"), date.Format("15:04")),
+					IsRelevant:      checkIfRelevant(row[3], row[6], date.Format("Mon"), date.Format("15:04"), false),
 				}
 
 				messeService.Create(&m)
@@ -1108,7 +1160,13 @@ func Error404Handler(c *gin.Context) {
 }
 
 // g = Gottesdienst, b = Bemerkung, t = Tag, u = Uhrzeit
-func checkIfRelevant(g string, b string, t string, u string) bool {
+func checkIfRelevant(g string, b string, t string, u string, f bool) bool {
+
+	// If Fällt aus is true
+	if f {
+		return false
+	}
+
 	if strings.Contains(b, "panisch") {
 		return false
 	}
@@ -1133,6 +1191,10 @@ func checkIfRelevant(g string, b string, t string, u string) bool {
 		return false
 	}
 
+	if strings.Contains(b, "St. Sebastian") {
+		return false
+	}
+
 	if strings.Contains(g, "andacht") {
 		return false
 	}
@@ -1141,7 +1203,15 @@ func checkIfRelevant(g string, b string, t string, u string) bool {
 		return false
 	}
 
-	if (t == "Fri") && (u == "09:00") && (g == "Messe" || g == "Festmesse") {
+	if strings.Contains(g, "Orgelstunde") {
+		return false
+	}
+
+	if strings.Contains(g, "ökum.") {
+		return false
+	}
+
+	if (t == "Fri") && (u == "09:30") && (g == "Messe" || g == "Festmesse") {
 		return false
 	}
 

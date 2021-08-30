@@ -8,7 +8,22 @@
 	
 </div>
   <div class="row row-cards">
-    <div class="col-lg-3">
+    <div class="col-lg-2">
+
+      <form class="card" method="POST" action="/messen/importFromKaplan">
+        <div class="card-status  card-status bg-green"></div>
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-table"></i> Messen laden</h3>
+        </div>
+        <div class="card-body">
+          <p>Über den Klick auf den unteren Button werden die Messen für die nächsten 60 Tage aus dem Internet in das System geladen. Bestehende Messen werden nicht überschrieben.</p>          
+        </div>
+        <div class="card-footer text-right">
+          <input name="kirchenID" type="text" value="8" hidden>
+          <input name="anzahlTage" type="text" value="60" hidden >
+          <button submit class="btn btn-green"><i class="fe fe-download"></i> Messen laden</button>
+        </div>
+      </form>
 
       <form class="card" method="POST">
         <div class="card-status  card-status bg-green"></div>
@@ -58,7 +73,7 @@
         </div>
       </form>
 
-      <form class="card" id="uploadForm" method="POST" action="/messen/importFromExcel" enctype="multipart/form-data">
+      <form class="card" id="uploadForm" method="POST" action="/messen/importFromExcel" enctype="multipart/form-data" hidden>
         <div class="card-status  card-status bg-green"></div>
         <div class="card-header">
           <h3 class="card-title"><i class="fa fa-table"></i> Messen aus Exceltabelle hinzufügen</h3>
@@ -101,7 +116,7 @@
 
       </form>
     </div>
-    <div class="col-lg-9">
+    <div class="col-lg-10">
 
       <div class="card">
         <div class="table-responsive">

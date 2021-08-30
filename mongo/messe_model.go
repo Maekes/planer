@@ -13,6 +13,7 @@ type MesseModel struct {
 	Id                 bson.ObjectId `bson:"_id,omitempty"`
 	UUID               uuid.UUID
 	Datum              time.Time
+	KaplanID           string
 	Gottesdienst       string
 	LiturgischerTag    string
 	Bemerkung          string

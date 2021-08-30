@@ -25,4 +25,4 @@ WORKDIR /go/src/github.com/Maekes/planer
 RUN go install
 
 # Build the binary
-ENTRYPOINT planer -notls -pw=ADD_IMAP_PW_HERE
+ENTRYPOINT planer -notls -pw=ADD_IMAP_PW_HERE  -kaplan=ADD_KAPLAN_REF_HERE

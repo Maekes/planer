@@ -31,6 +31,15 @@ func (p *MesseService) Create(m *MesseModel) error {
 	return p.collection.Insert(&m)
 }
 
+func (p *MesseService) CreateFromKaplan(m *MesseModel) error {
+	m.UserUUID = p.aktUser
+	i, _ := p.collection.Find(bson.M{"kaplanid": m.KaplanID, "useruuid": p.aktUser}).Count()
+	if i == 0 {
+		return p.collection.Insert(&m)
+	}
+	return fmt.Errorf("messe with id: %s already exists in database", m.KaplanID)
+}
+
 func (p *MesseService) GetAllMessen() (*[]MesseModel, error) {
 	var results []MesseModel
 	err := p.collection.Find(bson.M{"useruuid": p.aktUser}).Sort("datum").All(&results)
@@ -168,7 +177,7 @@ func (p *MesseService) AddMiniToMesse(UId uuid.UUID, m MiniModel) error {
 		err = nil
 		err = p.collection.Update(bson.M{"uuid": UId, "useruuid": p.aktUser}, bson.M{"$addToSet": bson.M{"minisforplan": m.UUID}})
 	} else {
-		err = errors.New("Mini already in field")
+		err = errors.New("mini already in field")
 	}
 	return err
 }
@@ -215,7 +224,6 @@ func (p *MesseService) CountMiniInMessen(from time.Time, to time.Time, mini uuid
 	).Count()
 
 	if err != nil {
-		fmt.Println(err)
 		//TODO
 	}
 

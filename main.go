@@ -15,6 +15,7 @@ import (
 func main() {
 
 	flag.StringVar(&handler.MailPW, "pw", "", "Password for MailServer")
+	flag.StringVar(&handler.KaplanSecret, "kaplan", "", "Secret RefID from Kaplan")
 	local := flag.Bool("local", false, "Run Server on Local Machine")
 	update := flag.Bool("update", false, "Run Update Function")
 	noTLS := flag.Bool("notls", false, "Disable TLS for Webserver")
@@ -81,6 +82,7 @@ func main() {
 		auth.POST("/messen/deleteAll", handler.MessenDeleteAllHandler)
 		auth.POST("/messen/updateRelevantState", handler.MessenUpdateStateHandler)
 		auth.POST("/messen/importFromExcel", handler.AddMessenFromExcelHandler)
+		auth.POST("/messen/importFromKaplan", handler.AddMessenFromKaplanHandler)
 
 		auth.POST("/messdienerplan/changehinweis", handler.MessdienerplanChangeHinweisHandler)
 		auth.POST("/messdienerplan/create", handler.MessdienerplanCreateHandler)

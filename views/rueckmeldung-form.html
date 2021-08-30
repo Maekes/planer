@@ -1,196 +1,266 @@
 <html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta http-equiv="Content-Language" content="en" />
+        <meta name="msapplication-TileColor" content="#2d89ef" />
+        <meta name="theme-color" content="#4188c9" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="HandheldFriendly" content="True" />
+        <meta name="MobileOptimized" content="320" />
+        <title>{{.Title}}</title>
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i,500,500i,600,600i,700,700i&amp;subset=latin-ext"
+        />
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        />
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"
+            integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
+            crossorigin="anonymous"
+        ></script>
+        <style>
+            .checkbox label:after,
+            .radio label:after {
+                content: '';
+                display: table;
+                clear: both;
+            }
 
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport"
-			content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
-		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<meta http-equiv="Content-Language" content="en" />
-		<meta name="msapplication-TileColor" content="#2d89ef" />
-		<meta name="theme-color" content="#4188c9" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="mobile-web-app-capable" content="yes" />
-		<meta name="HandheldFriendly" content="True" />
-		<meta name="MobileOptimized" content="320" />
-		<title>{{.Title}}</title>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
-		<link rel="stylesheet"
-			href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i,500,500i,600,600i,700,700i&amp;subset=latin-ext" />
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" />
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"
-			integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
-		<style>
-			.checkbox label:after,
-			.radio label:after {
-				content: '';
-				display: table;
-				clear: both;
-			}
+            .checkbox .cr,
+            .radio .cr {
+                position: relative;
+                display: inline-block;
+                border: 2px solid #670000;
+                color: #670000;
+                border-radius: 1em;
+                width: 1.4em;
+                height: 1.4em;
+                float: left;
+                margin-right: 0.7em;
+                margin-top: 1px;
+            }
 
-			.checkbox .cr,
-			.radio .cr {
-				position: relative;
-				display: inline-block;
-				border: 2px solid #670000;
-				color: #670000;
-				border-radius: 1em;
-				width: 1.4em;
-				height: 1.4em;
-				float: left;
-				margin-right: 0.7em;
-				margin-top: 1px;
-			}
+            .radio .cr {
+                border-radius: 50%;
+            }
 
-			.radio .cr {
-				border-radius: 50%;
-			}
+            .checkbox .cr .cr-icon,
+            .radio .cr .cr-icon {
+                position: absolute;
+                font-size: 0.8em;
+                line-height: 0;
+                top: 50%;
+                left: 20%;
+            }
 
-			.checkbox .cr .cr-icon,
-			.radio .cr .cr-icon {
-				position: absolute;
-				font-size: 0.8em;
-				line-height: 0;
-				top: 50%;
-				left: 20%;
-			}
+            .radio .cr .cr-icon {
+                margin-left: 0em;
+            }
 
-			.radio .cr .cr-icon {
-				margin-left: 0em;
-			}
+            .checkbox label input[type='checkbox'],
+            .radio label input[type='radio'] {
+                display: none;
+            }
 
-			.checkbox label input[type='checkbox'],
-			.radio label input[type='radio'] {
-				display: none;
-			}
+            .checkbox label input[type='checkbox'] + .cr > .cr-icon,
+            .radio label input[type='radio'] + .cr > .cr-icon {
+                opacity: 0;
+            }
 
-			.checkbox label input[type='checkbox']+.cr>.cr-icon,
-			.radio label input[type='radio']+.cr>.cr-icon {
-				opacity: 0;
-			}
+            .checkbox label input[type='checkbox']:checked + .cr > .cr-icon,
+            .radio label input[type='radio']:checked + .cr > .cr-icon {
+                opacity: 1;
+            }
 
-			.checkbox label input[type='checkbox']:checked+.cr>.cr-icon,
-			.radio label input[type='radio']:checked+.cr>.cr-icon {
-				opacity: 1;
-			}
+            .checkbox label input[type='checkbox']:disabled + .cr,
+            .radio label input[type='radio']:disabled + .cr {
+                opacity: 0.5;
+            }
 
-			.checkbox label input[type='checkbox']:disabled+.cr,
-			.radio label input[type='radio']:disabled+.cr {
-				opacity: 0.5;
-			}
+            .rounded-lg {
+                border-radius: 0.5rem !important;
+            }
+        </style>
+    </head>
 
-			.rounded-lg {
-				border-radius: 0.5rem !important
-			}
-		</style>
-	</head>
+    <body class="p-3 bg-light">
+        <div class="container shadow bg-white rounded-lg">
+            <div class="row">
+                <div class="col-12 p-3">
+                    <h2>Messdienerplan {{.planTitle}} | Rückmeldung</h2>
+                    <p>{{.hinweis}}</p>
+                    <div
+                        class="alert alert-icon alert-danger"
+                        role="alert"
+                        id="alertError"
+                        hidden
+                    >
+                        <i class="fa fa-warning mr-2" aria-hidden="true"></i>
+                    </div>
+                    <div
+                        class="alert alert-icon alert-success"
+                        role="alert"
+                        id="alertNoError"
+                        hidden
+                    >
+                        <i class="fa fa-check mr-2" aria-hidden="true"></i>
+                    </div>
+                    <form id="form" action="/rueckmeldung" method="POST">
+                        <div class="form-group row m-0 mb-4 mt-4">
+                            <input
+                                type="text"
+                                class="custom-control-input"
+                                name="planid"
+                                hidden
+                                value="{{.planID}}"
+                            />
+                            <label
+                                for="name"
+                                class="col-sm-3 pl-0 font-weight-bold"
+                                >Name / Namen</label
+                            >
+                            <div class="col-sm-9 p-0">
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    required="required"
+                                    class="form-control"
+                                    placeholder="Vor- und Nachnamen"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group row m-0">
+                            <label class="col-sm-3 pl-0 font-weight-bold"
+                                >Wunschmessen</label
+                            >
+                            <div class="col-sm-9 p-0">
+                                {{range $index, $valueMessen :=
+                                getMessenDividedInWeeks .messenPayload}} {{range
+                                $index, $value := .Messen}}
+                                <div class="checkbox">
+                                    <label style="font-size: 1.1em">
+                                        <input
+                                            type="checkbox"
+                                            name="uuid"
+                                            value="{{.UUID}}"
+                                        />
+                                        <span class="cr"
+                                            ><i class="cr-icon fa fa-check"></i
+                                        ></span>
+                                        {{getDayShort .Datum}}. {{getDate
+                                        .Datum}} - {{getTime .Datum}} -
+                                        {{.Gottesdienst}} {{if eq .InfoForPlan
+                                        ""}} {{else}} ({{.InfoForPlan}}) {{end}}
+                                    </label>
+                                </div>
+                                {{end}}
+                                <p class="mb-5"></p>
+                                {{end}}
+                            </div>
+                        </div>
+                        <div class="form-group row mr-0 ml-0">
+                            <label
+                                for="hinweis"
+                                class="col-sm-3 pl-0 font-weight-bold"
+                                >Hinweis / Wunschpartner / Sonstiges</label
+                            >
+                            <div class="col-sm-9 p-0">
+                                <textarea
+                                    id="hinweis"
+                                    name="hinweis"
+                                    type="text"
+                                    class="form-control"
+                                    rows="3"
+                                ></textarea>
+                            </div>
+                        </div>
+                        <div class="row justify-content-md-center">
+                            <div class="col col-md-4">
+                                <button
+                                    type="submit"
+                                    class="
+                                        btn btn-loading btn-lg btn-block
+                                        mt-2
+                                    "
+                                    id="submitButton"
+                                    style="
+                                        color: #fff;
+                                        background-color: #670000;
+                                    "
+                                >
+                                    <i class="fa fa-send mr-2"></i>Abschicken
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        $('#form').submit(function (e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+            $('#submitButton').addClass('disabled');
 
-	<body class="p-3 bg-light">
-		<div class="container shadow bg-white rounded-lg">
-			<div class="row">
-				<div class="col-12 p-3">
-					<h2>Messdienerplan {{.planTitle}} | Rückmeldung</h2>
-					<p>{{.hinweis}}</p>
-					<div class="alert alert-icon alert-danger" role="alert" id="alertError" hidden>
-						<i class="fa fa-warning mr-2" aria-hidden="true"></i>
-					</div>
-					<div class="alert alert-icon alert-success" role="alert" id="alertNoError" hidden>
-						<i class="fa fa-check mr-2" aria-hidden="true"></i>
-					</div>
-					<form id="form" action="/rueckmeldung" method="POST">
-						<div class="form-group row m-0 mb-4 mt-4">
-							<input type="text" class="custom-control-input" name="planid" hidden value="{{.planID}}" />
-							<label for="name" class="col-sm-3 pl-0 font-weight-bold">Name / Namen</label>
-							<div class="col-sm-9 p-0">
-								<input id="name" name="name" type="text" required="required" class="form-control"
-									placeholder="Vor- und Nachnamen" />
-							</div>
-						</div>
-						<div class="form-group row m-0">
-							<label class="col-sm-3 pl-0 font-weight-bold">Wunschmessen</label>
-							<div class="col-sm-9 p-0">
-								{{range $index, $valueMessen := getMessenDividedInWeeks .messenPayload}}
-								{{range $index, $value := .Messen}}
-								<div class="checkbox">
-									<label style="font-size: 1.1em">
-										<input type="checkbox" name="uuid" value="{{.UUID}}" />
-										<span class="cr"><i class="cr-icon fa fa-check"></i></span>
-										{{getDayShort .Datum}} {{getDate .Datum}} - {{getTime .Datum}} -
-										{{.Gottesdienst}} {{if eq .InfoForPlan ""}}
-										{{else}}
-											({{.InfoForPlan}}) {{end}}
-									</label>
-								</div>
-								{{end}}
-								<p class="mb-5"></p>
-								{{end}}
-							</div>
-						</div>
-						<div class="form-group row mr-0 ml-0">
-							<label for="hinweis" class="col-sm-3 pl-0 font-weight-bold">Hinweis / Wunschpartner /
-								Sonstiges</label>
-							<div class="col-sm-9 p-0">
-								<textarea id="hinweis" name="hinweis" type="text" class="form-control"
-									rows="3"></textarea>
-							</div>
-						</div>
-						<div class="row justify-content-md-center">
-							<div class="col col-md-4">
-								<button type="submit" class="btn btn-loading btn-lg btn-block  mt-2" id="submitButton"
-									style="color: #fff; background-color: #670000">
-									<i class="fa fa-send mr-2"></i>Abschicken
-								</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</body>
-	<script>
-		$('#form').submit(function (e) {
-			e.preventDefault(); // avoid to execute the actual submit of the form.
-			$('#submitButton').addClass('disabled');
+            var form = $(this);
+            var url = form.attr('action');
 
-			var form = $(this);
-			var url = form.attr('action');
-
-			$.ajax({
-				type: 'POST',
-				url: url,
-				data: form.serialize(), // serializes the form's elements.
-				dataType: 'json',
-				success: function (resp) {
-					if (resp.error) {
-						window.scrollTo(0, 0);
-						window.scroll(0, 0);
-						$('#alertNoError').attr('hidden', true);
-						$('#alertError').removeAttr('hidden');
-						$('#alertError').append(resp.message);
-						$('#submitButton').removeClass('disabled');
-					} else {
-						$('#alertError').attr('hidden', true);
-						$('#form').trigger('reset');
-						window.scrollTo(0, 0);
-						window.scroll(0, 0);
-						$('#alertNoError').removeAttr('hidden');
-						$('#alertNoError').append(resp.message);
-						$('#submitButton').removeClass('disabled');
-					}
-				},
-				error: function () {
-					$('#alertNoError').attr('hidden', true);
-					window.scrollTo(0, 0);
-					window.scroll(0, 0);
-					$('#alertError').removeAttr('hidden');
-					$('#alertError').append(
-						'Es ist ein Fehler aufgetreten, die Rückmeldung konnte nicht versendet werden. Versuchen Sie es später noch einmal.'
-					);
-					$('#submitButton').removeClass('disabled');
-				},
-			});
-		});
-	</script>
-
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: form.serialize(), // serializes the form's elements.
+                dataType: 'json',
+                success: function (resp) {
+                    if (resp.error) {
+                        window.scrollTo(0, 0);
+                        window.scroll(0, 0);
+                        $('#alertNoError').attr('hidden', true);
+                        $('#alertError').removeAttr('hidden');
+                        $('#alertError').append(resp.message);
+                        $('#submitButton').removeClass('disabled');
+                    } else {
+                        $('#alertError').attr('hidden', true);
+                        $('#form').trigger('reset');
+                        window.scrollTo(0, 0);
+                        window.scroll(0, 0);
+                        $('#alertNoError').removeAttr('hidden');
+                        $('#alertNoError').append(resp.message);
+                        $('#submitButton').removeClass('disabled');
+                    }
+                },
+                error: function () {
+                    $('#alertNoError').attr('hidden', true);
+                    window.scrollTo(0, 0);
+                    window.scroll(0, 0);
+                    $('#alertError').removeAttr('hidden');
+                    $('#alertError').append(
+                        'Es ist ein Fehler aufgetreten, die Rückmeldung konnte nicht versendet werden. Versuchen Sie es später noch einmal.'
+                    );
+                    $('#submitButton').removeClass('disabled');
+                },
+            });
+        });
+    </script>
 </html>

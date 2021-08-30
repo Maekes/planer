@@ -13,16 +13,17 @@ require (
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/autotls v0.0.0-20190528142357-3135c7b8d15d
-	github.com/gin-gonic/gin v1.4.0
+	github.com/gin-gonic/gin v1.7.4
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
-	github.com/golang/protobuf v1.3.2 // indirect
-	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/go-playground/validator/v10 v10.9.0 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/jinzhu/now v1.0.1
-	github.com/json-iterator/go v1.1.7 // indirect
+	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/jung-kurt/gofpdf v1.5.4
 	github.com/labstack/echo/v4 v4.1.8 // indirect
+	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/nkovacs/streamquote v1.0.0 // indirect
 	github.com/phpdave11/gofpdi v1.0.5 // indirect
 	github.com/satori/go.uuid v1.2.0
@@ -30,10 +31,14 @@ require (
 	github.com/tealeg/xlsx v1.0.3 // indirect
 	github.com/test-go/testify v1.1.4 // indirect
 	github.com/trustelem/zxcvbn v1.0.1
-	github.com/ugorji/go v1.1.7 // indirect
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	github.com/ugorji/go v1.2.6 // indirect
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
+	golang.org/x/sys v0.0.0-20210823070655-63515b42dcdf // indirect
+	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.0.0-20190807201305-8be58fba6352 // indirect
+	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
