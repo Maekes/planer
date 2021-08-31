@@ -156,9 +156,8 @@
                                 >Wunschmessen</label
                             >
                             <div class="col-sm-9 p-0">
-                                {{range $index, $valueMessen :=
-                                getMessenDividedInWeeks .messenPayload}} {{range
-                                $index, $value := .Messen}}
+                                {{range $index, $valueMessen := getMessenDividedInWeeks .messenPayload}} 
+                                {{range $index, $value := .Messen}}
                                 <div class="checkbox">
                                     <label style="font-size: 1.1em">
                                         <input
