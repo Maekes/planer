@@ -168,10 +168,8 @@
                                         <span class="cr"
                                             ><i class="cr-icon fa fa-check"></i
                                         ></span>
-                                        {{getDayShort .Datum}}. {{getDate
-                                        .Datum}} - {{getTime .Datum}} -
-                                        {{.Gottesdienst}} {{if eq .InfoForPlan
-                                        ""}} {{else}} ({{.InfoForPlan}}) {{end}}
+                                        {{getDayShort .Datum}}. {{getDate .Datum}} - {{getTime .Datum}} - {{.Gottesdienst}} 
+                                        {{if eq .InfoForPlan  ""}} {{else}} ({{.InfoForPlan}}) {{end}}
                                     </label>
                                 </div>
                                 {{end}}
