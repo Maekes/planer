@@ -968,7 +968,7 @@ func AddMessenFromKaplanHandler(c *gin.Context) {
 
 	var messen []KaplanData
 
-	url := "https://flex9.kaplanhosting.de:8443/get.asp?ref=%s&mode=T1&type=json&KG=%s&Days=%s"
+	url := "https://flex7.kaplanhosting.de:8443/get.asp?ref=%s&mode=T1&type=json&KG=%s&Days=%s"
 
 	kirchenID := c.PostForm("kirchenID")
 	anzahlTage := c.PostForm("anzahlTage")
