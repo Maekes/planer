@@ -466,7 +466,7 @@ func MessdienerplanPdfHandler(c *gin.Context) {
 
 		//pdf.SetDrawColor(val, val, val)
 		//pdf.SetTextColor(val, val, val)
-		pdf.Image("kirche.png", 2, 7, 17, 20, false, "", 0, "")
+		pdf.Image("logokn.png", 2, 7, 17, 17, false, "", 0, "")
 		pdf.SetFont("Helvetica", "", 25)
 		pdf.TransformBegin()
 		pdf.TransformRotate(90, 12, 255)
@@ -499,7 +499,7 @@ func MessdienerplanPdfHandler(c *gin.Context) {
 			messdiener = "freiwillig"
 		}
 
-		g := m.Gottesdienst + "\n" + m.InfoForPlan
+		g := m.Gottesdienst + "\n" + m.Ort + "\n" + m.InfoForPlan
 		rows = append(rows, []string{toGermanShort(m.Datum.Format("Mon")) + " " + m.Datum.Format("02.01."), m.Datum.Format("15:04"), utf(g), utf(messdiener)})
 	}
 	if err != nil {
@@ -968,19 +968,19 @@ func AddMessenFromKaplanHandler(c *gin.Context) {
 
 	var messen []KaplanData
 
-	url := "https://flex7.kaplanhosting.de:8443/get.asp?ref=%s&mode=T1&type=json&KG=%s&Days=%s"
-
 	kirchenID := c.PostForm("kirchenID")
 	anzahlTage := c.PostForm("anzahlTage")
 
-	request, err := http.Get(fmt.Sprintf(url, KaplanSecret, kirchenID, anzahlTage))
+	url := fmt.Sprintf("https://flex7.kaplanhosting.de:8443/get.asp?ref=%s&mode=T1&type=json&KG=%s&Days=%s", KaplanSecret, kirchenID, anzahlTage)
+
+	request, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
 		c.Redirect(http.StatusFound, "/messen")
 		return
 	}
 	json.NewDecoder(request.Body).Decode(&messen)
-
+	fmt.Println(url)
 	for _, messe := range messen {
 		uid := uuid.NewV4()
 		location, _ := time.LoadLocation("Europe/Berlin")
@@ -994,10 +994,11 @@ func AddMessenFromKaplanHandler(c *gin.Context) {
 			UUID:            uid,
 			KaplanID:        messe.ID,
 			Datum:           date,
+			Ort:             messe.Ort,
 			Gottesdienst:    messe.Gottesdienst,
 			LiturgischerTag: "",
 			Bemerkung:       messe.Zusatz,
-			IsRelevant:      checkIfRelevant(messe.Gottesdienst, messe.Zusatz, date.Format("Mon"), date.Format("15:04"), messe.FaelltAus),
+			IsRelevant:      checkIfRelevant(messe.Gottesdienst, messe.Zusatz, date.Format("Mon"), date.Format("15:04"), messe.FaelltAus, messe.Ort),
 		}
 		messeService.CreateFromKaplan(&m)
 	}
@@ -1072,7 +1073,7 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 						Gottesdienst:    row.Col(3),
 						LiturgischerTag: row.Col(5),
 						Bemerkung:       row.Col(6),
-						IsRelevant:      checkIfRelevant(row.Col(3), row.Col(6), d.Format("Mon"), d.Format("15:04"), false),
+						IsRelevant:      checkIfRelevant(row.Col(3), row.Col(6), d.Format("Mon"), d.Format("15:04"), false, ""),
 					}
 
 					messeService.Create(&m)
@@ -1115,7 +1116,7 @@ func AddMessenFromExcelHandler(c *gin.Context) {
 					Gottesdienst:    row[3],
 					LiturgischerTag: row[5],
 					Bemerkung:       row[6],
-					IsRelevant:      checkIfRelevant(row[3], row[6], date.Format("Mon"), date.Format("15:04"), false),
+					IsRelevant:      checkIfRelevant(row[3], row[6], date.Format("Mon"), date.Format("15:04"), false, ""),
 				}
 
 				messeService.Create(&m)
@@ -1159,8 +1160,24 @@ func Error404Handler(c *gin.Context) {
 	c.HTML(http.StatusNotFound, "404.html", gin.H{})
 }
 
-// g = Gottesdienst, b = Bemerkung, t = Tag, u = Uhrzeit
-func checkIfRelevant(g string, b string, t string, u string, f bool) bool {
+// g = Gottesdienst, b = Bemerkung, t = Tag, u = Uhrzeit, o=ort
+func checkIfRelevant(g string, b string, t string, u string, f bool, o string) bool {
+
+	if o == "St. Barbara" {
+		return false
+	}
+
+	if o == "St. Kamillus" {
+		return false
+	}
+
+	if o == "St. Sebastian" {
+		return false
+	}
+
+	if o == "Immaculata (Kapelle)" {
+		return false
+	}
 
 	// If Fällt aus is true
 	if f {
@@ -1179,6 +1196,18 @@ func checkIfRelevant(g string, b string, t string, u string, f bool) bool {
 		return false
 	}
 
+	if strings.Contains(b, "talienische") {
+		return false
+	}
+
+	if strings.Contains(b, "roatische") {
+		return false
+	}
+
+	if strings.Contains(b, "amilische") {
+		return false
+	}
+
 	if strings.Contains(b, "ENTFÄLLT") {
 		return false
 	}
@@ -1192,6 +1221,10 @@ func checkIfRelevant(g string, b string, t string, u string, f bool) bool {
 	}
 
 	if strings.Contains(b, "St. Sebastian") {
+		return false
+	}
+
+	if strings.Contains(b, "mit der Gemeinschaft der Frauen") {
 		return false
 	}
 

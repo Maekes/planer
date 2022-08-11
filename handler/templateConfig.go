@@ -147,7 +147,7 @@ func toGerman(d string) string {
 	case "Wed":
 		return "Mittwoch"
 	case "Thu":
-		return "Donerstag"
+		return "Donnerstag"
 	case "Fri":
 		return "Freitag"
 	case "Sat":

@@ -14,6 +14,7 @@ type MesseModel struct {
 	UUID               uuid.UUID
 	Datum              time.Time
 	KaplanID           string
+	Ort                string
 	Gottesdienst       string
 	LiturgischerTag    string
 	Bemerkung          string

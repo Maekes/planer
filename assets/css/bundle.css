@@ -19231,4 +19231,8 @@ svg {
 .fe-zoom-out:before {
   content: "\ea06";
 }
+
+.opacity-50 {
+  opacity: 0.5;
+}
 /*# sourceMappingURL=bundle.css.map */

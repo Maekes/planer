@@ -156,8 +156,9 @@
                                 >Wunschmessen</label
                             >
                             <div class="col-sm-9 p-0">
-                                {{range $index, $valueMessen := getMessenDividedInWeeks .messenPayload}} 
-                                {{range $index, $value := .Messen}}
+                                {{range $index, $valueMessen :=
+                                getMessenDividedInWeeks .messenPayload}} {{range
+                                $index, $value := .Messen}}
                                 <div class="checkbox">
                                     <label style="font-size: 1.1em">
                                         <input
@@ -168,8 +169,11 @@
                                         <span class="cr"
                                             ><i class="cr-icon fa fa-check"></i
                                         ></span>
-                                        {{getDayShort .Datum}}. {{getDate .Datum}} - {{getTime .Datum}} - {{.Gottesdienst}} 
-                                        {{if eq .InfoForPlan  ""}} {{else}} ({{.InfoForPlan}}) {{end}}
+                                        {{getDayShort .Datum}}. {{getDate
+                                        .Datum}} - {{getTime .Datum}} -
+                                        {{.Gottesdienst}} ({{.Ort}}) {{if eq
+                                        .InfoForPlan ""}} {{else}}
+                                        ({{.InfoForPlan}}) {{end}}
                                     </label>
                                 </div>
                                 {{end}}
@@ -197,10 +201,7 @@
                             <div class="col col-md-4">
                                 <button
                                     type="submit"
-                                    class="
-                                        btn btn-loading btn-lg btn-block
-                                        mt-2
-                                    "
+                                    class="btn btn-loading btn-lg btn-block mt-2"
                                     id="submitButton"
                                     style="
                                         color: #fff;
