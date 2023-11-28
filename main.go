@@ -15,6 +15,7 @@ import (
 func main() {
 
 	flag.StringVar(&handler.MailPW, "pw", "", "Password for MailServer")
+	flag.StringVar(&handler.KaplanHost, "host", "", "Host for Kaplan Server")
 	flag.StringVar(&handler.KaplanSecret, "kaplan", "", "Secret RefID from Kaplan")
 	local := flag.Bool("local", false, "Run Server on Local Machine")
 	update := flag.Bool("update", false, "Run Update Function")

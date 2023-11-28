@@ -39,6 +39,7 @@ var session *mongo.Session
 
 var MailPW string
 var KaplanSecret string
+var KaplanHost string
 
 func InitHandler(url string) {
 	session, err := mongo.NewSession(url)
@@ -971,7 +972,7 @@ func AddMessenFromKaplanHandler(c *gin.Context) {
 	kirchenID := c.PostForm("kirchenID")
 	anzahlTage := c.PostForm("anzahlTage")
 
-	url := fmt.Sprintf("https://flex7.kaplanhosting.de:8443/get.asp?ref=%s&mode=T1&type=json&KG=%s&Days=%s", KaplanSecret, kirchenID, anzahlTage)
+	url := fmt.Sprintf("https://%s/get.asp?ref=%s&mode=T1&type=json&KG=%s&Days=%s", KaplanHost, KaplanSecret, kirchenID, anzahlTage)
 
 	request, err := http.Get(url)
 	if err != nil {
