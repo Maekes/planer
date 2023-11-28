@@ -8,3 +8,4 @@ DOCKERFILE
 *.yml
 *.crt
 *.key
+.env

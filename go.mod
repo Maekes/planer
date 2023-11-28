@@ -17,6 +17,7 @@ require (
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/jinzhu/now v1.0.1
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/jung-kurt/gofpdf v1.5.4
 	github.com/mattn/go-isatty v0.0.13 // indirect

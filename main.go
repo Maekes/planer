@@ -3,9 +3,11 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/Maekes/planer/handler"
 	"github.com/gin-contrib/cors"
+	"github.com/joho/godotenv"
 
 	jwtsession "github.com/ScottHuangZL/gin-jwt-session"
 	"github.com/gin-gonic/autotls"
@@ -13,10 +15,10 @@ import (
 )
 
 func main() {
-
-	flag.StringVar(&handler.MailPW, "pw", "", "Password for MailServer")
-	flag.StringVar(&handler.KaplanHost, "host", "", "Host for Kaplan Server")
-	flag.StringVar(&handler.KaplanSecret, "kaplan", "", "Secret RefID from Kaplan")
+	godotenv.Load()
+	//flag.StringVar(&handler.MailPW, "pw", "", "Password for MailServer")
+	//flag.StringVar(&handler.KaplanHost, "host", "", "Host for Kaplan Server")
+	//flag.StringVar(&handler.KaplanSecret, "kaplan", "", "Secret RefID from Kaplan")
 	local := flag.Bool("local", false, "Run Server on Local Machine")
 	update := flag.Bool("update", false, "Run Update Function")
 	noTLS := flag.Bool("notls", false, "Disable TLS for Webserver")
@@ -115,7 +117,7 @@ func main() {
 	} else if *noTLS {
 		r.Run("0.0.0.0:80")
 	} else {
-		log.Fatal(autotls.Run(r, "planer.minis-quirin.de", "www.planer.minis-quirin.de"))
+		log.Fatal(autotls.Run(r, os.Getenv("Host"), "www."+os.Getenv("Host")))
 	}
 
 }

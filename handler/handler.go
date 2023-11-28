@@ -35,11 +35,15 @@ var messeService *mongo.MesseService
 var miniService *mongo.MiniService
 var planService *mongo.PlanService
 
-var session *mongo.Session
-
 var MailPW string
+var MailAdress string
+var MailResponse string
+var MailSMTP string
+var MailPort string
 var KaplanSecret string
 var KaplanHost string
+
+var session *mongo.Session
 
 func InitHandler(url string) {
 	session, err := mongo.NewSession(url)
@@ -47,13 +51,21 @@ func InitHandler(url string) {
 		log.Fatalf("Unable to connect to mongo: %s", err)
 	}
 
+	MailPW = os.Getenv("MailPW")
+	MailAdress = os.Getenv("MailAdress")
+	MailResponse = os.Getenv("MailResponse")
+	MailSMTP = os.Getenv("MailSMTP")
+	MailPort = os.Getenv("MailPort")
+	KaplanSecret = os.Getenv("KaplanSecret")
+	KaplanHost = os.Getenv("KaplanHost")
+
 	userService = mongo.NewUserService(session.Copy(), dbName, "user")
 	messeService = mongo.NewMesseService(session.Copy(), dbName, "messen")
 	miniService = mongo.NewMiniService(session.Copy(), dbName, "minis")
 	planService = mongo.NewPlanService(session.Copy(), dbName, "plan")
 
 	if !userService.ExistsAdmin() {
-		userService.CreateNewUser("admin", "admin@planer.minis-quirin.de", "admin", role.Admin)
+		userService.CreateNewUser("admin", os.Getenv("AdminMail"), "admin", role.Admin)
 		log.Println("#### Created new admin u:admin/p:admin ####")
 	}
 }
@@ -162,13 +174,14 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	me, err := messeService.GetAllMessenWithUUIDsPublic(messen)
 
 	type rueckmeldung struct {
-		Plantitel string
-		Name      string
-		Messen    *[]mongo.MesseModel
-		Hinweis   string
+		Plantitel    string
+		Name         string
+		Messen       *[]mongo.MesseModel
+		Hinweis      string
+		MailResponse string
 	}
 
-	r := rueckmeldung{plan.Titel, name, me, hinweis}
+	r := rueckmeldung{plan.Titel, name, me, hinweis, MailResponse}
 
 	t, err := template.New("rueckmeldung-mail-template.html").Funcs(C.Funcs).ParseFiles("views/rueckmeldung-mail-template.html")
 	if err != nil {
@@ -199,12 +212,14 @@ func RueckmeldungPostFormHandler(c *gin.Context) {
 	result := tpl.String()
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", "planer@minis-quirin.de")
-	m.SetHeader("To", "leiterrunde@minis-quirin.de")
+	m.SetHeader("From", MailAdress)
+	m.SetHeader("To", MailResponse)
 	m.SetHeader("Subject", name+" | Rückmeldung Plan "+plan.Titel)
 	m.SetBody("text/html", result)
 
-	d := gomail.NewDialer("minis-quirin.de", 465, "planer@minis-quirin.de", MailPW)
+	port, _ := strconv.Atoi(MailPort)
+
+	d := gomail.NewDialer(MailSMTP, port, MailAdress, MailPW)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	// Send the email
