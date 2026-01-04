@@ -39,7 +39,13 @@
                                 <p class="leading-tight mb-0">{{getDay .Datum}} - {{getDate .Datum}} -
                                     {{getTime .Datum}}
                                 </p>
-                                <b class="leading-tight mb-0 text-sm">{{.Ort}}</b>
+                                
+                                <div class="badge 
+                                    {{if eq .Ort "St. Quirin"}}bg-green{{else}} 
+                                    {{if eq .Ort "St. Marien"}}bg-red{{else}} 
+                                    {{if eq .Ort "Hl. Dreikönige"}}bg-yellow{{else}} 
+                                    {{if eq .Ort "St. Pius X."}}bg-blue{{else}} 
+                                    bg-light text-gray {{end}} {{end}} {{end}} {{end}}">{{.Ort}}</div>
                             </div>
                         </div>
                         <div class="col-md-4">

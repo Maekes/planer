@@ -1183,7 +1183,7 @@ func checkIfRelevant(g string, b string, t string, u string, f bool, o string) b
 		return false
 	}
 
-	if o == "St. Kamillus" {
+	if o == "St. Kamillus" || o == "St. Kamillus-\"Ewige Anbetung\"" {
 		return false
 	}
 
@@ -1191,7 +1191,11 @@ func checkIfRelevant(g string, b string, t string, u string, f bool, o string) b
 		return false
 	}
 
-	if o == "Immaculata (Kapelle)" {
+	if o == "St.Alexius-/St.Josef-KrH." {
+		return false
+	}
+
+	if o == "Immaculata (Kapelle)" || o == "Immaculata (Kap.)" {
 		return false
 	}
 
@@ -1201,6 +1205,9 @@ func checkIfRelevant(g string, b string, t string, u string, f bool, o string) b
 	}
 
 	if strings.Contains(b, "panisch") {
+		return false
+	}
+	if strings.Contains(b, "olnisch") {
 		return false
 	}
 
@@ -1244,6 +1251,10 @@ func checkIfRelevant(g string, b string, t string, u string, f bool, o string) b
 		return false
 	}
 
+	if strings.Contains(b, "mit der kfd") {
+		return false
+	}
+
 	if strings.Contains(g, "andacht") {
 		return false
 	}
@@ -1252,7 +1263,15 @@ func checkIfRelevant(g string, b string, t string, u string, f bool, o string) b
 		return false
 	}
 
+	if strings.Contains(g, "Laudes") {
+		return false
+	}
+
 	if strings.Contains(g, "Orgelstunde") {
+		return false
+	}
+
+	if strings.Contains(g, "Betstunde") {
 		return false
 	}
 

@@ -10,20 +10,83 @@
   <div class="row row-cards">
     <div class="col-lg-2">
 
-      <form class="card" method="POST" action="/messen/importFromKaplan">
-        <div class="card-status  card-status bg-green"></div>
+      <form class="card" method="POST" action="/messen/importFromKaplan" id="messenForm">
+        <div class="card-status card-status bg-green"></div>
+
         <div class="card-header">
-          <h3 class="card-title"><i class="fa fa-table"></i> Messen laden</h3>
+          <h3 class="card-title">
+            <i class="fa fa-table"></i> Messen laden
+          </h3>
         </div>
+
         <div class="card-body">
-          <p>Über den Klick auf den unteren Button werden die Messen für die nächsten 60 Tage aus dem Internet in das System geladen. Bestehende Messen werden nicht überschrieben.</p>          
+          <p>
+            Über den Klick auf den unteren Button werden die Messen für die nächsten
+            60 Tage aus dem Internet in das System geladen. Bestehende Messen werden
+            nicht überschrieben.
+          </p>
+
+          <!-- Checkboxen -->
+          <div class="form-group">
+            <label>
+              <input type="checkbox" class="kirche-checkbox" value="21" checked>
+              St. Quirin
+            </label><br>
+
+            <label>
+              <input type="checkbox" class="kirche-checkbox" value="22" checked>
+              Hl. Dreikönige
+            </label><br>
+
+            <label>
+              <input type="checkbox" class="kirche-checkbox" value="23" checked>
+              St. Pius
+            </label><br>
+
+            <label>
+              <input type="checkbox" class="kirche-checkbox" value="24" checked>
+              St. Marien
+            </label>
+          </div>
+
+          <!-- Fehlermeldung -->
+          <div id="kircheError" class="text-danger" style="display:none;">
+            Bitte wählen Sie mindestens eine Kirche aus.
+          </div>
         </div>
+
         <div class="card-footer text-right">
-          <input name="kirchenID" type="text" value="21,24" hidden>
-          <input name="anzahlTage" type="text" value="60" hidden >
-          <button submit class="btn btn-green"><i class="fe fe-download"></i> Messen laden</button>
+          <input name="kirchenID" id="kirchenID" type="hidden" value="21,22,23,24">
+          <input name="anzahlTage" type="hidden" value="60">
+
+          <button type="submit" class="btn btn-green">
+            <i class="fe fe-download"></i> Messen laden
+          </button>
         </div>
       </form>
+
+      <script>
+        function updateKirchenID() {
+          const checkboxes = document.querySelectorAll('.kirche-checkbox:checked');
+          const values = Array.from(checkboxes).map(cb => cb.value);
+          document.getElementById('kirchenID').value = values.join(',');
+        }
+
+        document.querySelectorAll('.kirche-checkbox').forEach(cb => {
+          cb.addEventListener('change', () => {
+            updateKirchenID();
+            document.getElementById('kircheError').style.display = 'none';
+          });
+        });
+
+        document.getElementById('messenForm').addEventListener('submit', function (e) {
+          const selected = document.querySelectorAll('.kirche-checkbox:checked');
+          if (selected.length === 0) {
+            e.preventDefault();
+            document.getElementById('kircheError').style.display = 'block';
+          }
+        });
+      </script>
 
       <form class="card" method="POST">
         <div class="card-status  card-status bg-green"></div>
@@ -147,7 +210,12 @@
               <td class=" {{if not .IsRelevant}}text-muted opacity-50{{end}}" name="{{convert .UUID}}">{{getDay .Datum}}</td>
               <td class=" {{if not .IsRelevant}}text-muted opacity-50{{end}}" name="{{convert .UUID}}">{{getDate .Datum}}</td>
               <td class=" {{if not .IsRelevant}}text-muted opacity-50{{end}}" name="{{convert .UUID}}">{{getTime .Datum}}</td>
-              <td class=" {{if not .IsRelevant}}text-muted opacity-50{{end}}" name="{{convert .UUID}}"><div class="badge {{if eq .Ort "St. Quirin"}}bg-green{{else}} {{if eq .Ort "St. Marien"}}bg-red{{else}} bg-light text-gray {{end}} {{end}}">{{.Ort}}</div></td>
+              <td class=" {{if not .IsRelevant}}text-muted opacity-50{{end}}" name="{{convert .UUID}}"><div class="badge 
+                {{if eq .Ort "St. Quirin"}}bg-green{{else}} 
+                {{if eq .Ort "St. Marien"}}bg-red{{else}} 
+                {{if eq .Ort "Hl. Dreikönige"}}bg-yellow{{else}} 
+                {{if eq .Ort "St. Pius X."}}bg-blue{{else}} 
+                bg-light text-gray {{end}} {{end}} {{end}} {{end}}">{{.Ort}}</div></td>
               <td class=" {{if not .IsRelevant}}text-muted opacity-50{{end}}" name="{{convert .UUID}}">{{.Gottesdienst}}</td>
               <td class=" {{if not .IsRelevant}}text-muted opacity-50{{end}} py-1 small" name="{{convert .UUID}}">L:
                 {{.LiturgischerTag}} <br>B: {{.Bemerkung}}</td>
